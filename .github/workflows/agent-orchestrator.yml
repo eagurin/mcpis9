@@ -30,7 +30,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: ${{ steps.gemini.outputs.reply }}
+          body: ${{ steps.gemini.outputs.stdout }}
 
       - name: Call Claude Agent
         if: contains(github.event.comment.body, 'claude')
