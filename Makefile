@@ -1,10 +1,10 @@
-# 🛠️ Modern Makefile for Backend Python App (2025)
-# Based on UV + Ruff + Pyright + Pre-commit best practices
+# 🛠️ Современный Makefile для Python Backend приложений (2025)
+# Основан на лучших практиках UV + Ruff + Pyright + Pre-commit
 
 .DEFAULT_GOAL := help
 .PHONY: help setup install dev clean lint test coverage run fix check security docker docs release all
 
-# 🔧 Configuration
+# 🔧 Конфигурация
 PYTHON := python3
 UV := uv
 PROJECT_NAME := mcpisia
@@ -12,7 +12,7 @@ SRC_DIR := app
 TESTS_DIR := tests
 DOCKER_IMAGE := $(PROJECT_NAME):latest
 
-# 🎨 Colors for output
+# 🎨 Цвета для вывода
 RESET := \033[0m
 BOLD := \033[1m
 RED := \033[31m
@@ -22,75 +22,75 @@ BLUE := \033[34m
 MAGENTA := \033[35m
 CYAN := \033[36m
 
-# 📋 Help command with emojis and sections
+# 📋 Команда помощи с эмодзи и разделами
 help:
-	@echo "$(BOLD)$(CYAN)🪝 $(PROJECT_NAME) - Modern Development Workflow$(RESET)"
+	@echo "$(BOLD)$(CYAN)🪝 $(PROJECT_NAME) - Современный рабочий процесс разработки$(RESET)"
 	@echo ""
-	@echo "$(BOLD)📦 Installation & Setup:$(RESET)"
-	@echo "  $(GREEN)setup$(RESET)           - 🚀 Complete project setup (UV + deps + pre-commit)"
-	@echo "  $(GREEN)install$(RESET)         - 📥 Install production dependencies"
-	@echo "  $(GREEN)dev$(RESET)             - 🔧 Install development dependencies"
-	@echo "  $(GREEN)clean$(RESET)           - 🧹 Clean cache and temporary files"
+	@echo "$(BOLD)📦 Установка и настройка:$(RESET)"
+	@echo "  $(GREEN)setup$(RESET)           - 🚀 Полная настройка проекта (UV + зависимости + pre-commit)"
+	@echo "  $(GREEN)install$(RESET)         - 📥 Установка production зависимостей"
+	@echo "  $(GREEN)dev$(RESET)             - 🔧 Установка development зависимостей"
+	@echo "  $(GREEN)clean$(RESET)           - 🧹 Очистка кэша и временных файлов"
 	@echo ""
-	@echo "$(BOLD)✅ Code Quality (2025 Stack):$(RESET)"
-	@echo "  $(GREEN)check$(RESET)           - 🔍 Run all checks (lint + types + security + tests)"
-	@echo "  $(GREEN)lint$(RESET)            - 🎯 Lint code with Ruff"
-	@echo "  $(GREEN)types$(RESET)           - 🔬 Type check with Pyright"
-	@echo "  $(GREEN)security$(RESET)        - 🔒 Security scan (GitLeaks + Bandit)"
-	@echo "  $(GREEN)format$(RESET)          - ✨ Format code with Ruff"
-	@echo "  $(GREEN)pre-commit$(RESET)      - 🪝 Run pre-commit on all files"
+	@echo "$(BOLD)✅ Качество кода (Стек 2025):$(RESET)"
+	@echo "  $(GREEN)check$(RESET)           - 🔍 Запуск всех проверок (lint + типы + безопасность + тесты)"
+	@echo "  $(GREEN)lint$(RESET)            - 🎯 Проверка кода с Ruff"
+	@echo "  $(GREEN)types$(RESET)           - 🔬 Проверка типов с Pyright"
+	@echo "  $(GREEN)security$(RESET)        - 🔒 Сканирование безопасности (GitLeaks + Bandit)"
+	@echo "  $(GREEN)format$(RESET)          - ✨ Форматирование кода с Ruff"
+	@echo "  $(GREEN)pre-commit$(RESET)      - 🪝 Запуск pre-commit на всех файлах"
 	@echo ""
-	@echo "$(BOLD)🧪 Testing:$(RESET)"
-	@echo "  $(GREEN)test$(RESET)            - 🚀 Run tests with pytest"
-	@echo "  $(GREEN)test-fast$(RESET)       - ⚡ Run fast tests only"
-	@echo "  $(GREEN)test-watch$(RESET)      - 👀 Run tests in watch mode"
-	@echo "  $(GREEN)coverage$(RESET)        - 📊 Generate coverage report"
+	@echo "$(BOLD)🧪 Тестирование:$(RESET)"
+	@echo "  $(GREEN)test$(RESET)            - 🚀 Запуск тестов с pytest"
+	@echo "  $(GREEN)test-fast$(RESET)       - ⚡ Запуск только быстрых тестов"
+	@echo "  $(GREEN)test-watch$(RESET)      - 👀 Запуск тестов в режиме наблюдения"
+	@echo "  $(GREEN)coverage$(RESET)        - 📊 Генерация отчёта покрытия"
 	@echo ""
 	@echo "$(BOLD)🐳 Docker:$(RESET)"
-	@echo "  $(GREEN)docker-build$(RESET)    - 🏗️  Build Docker image"
-	@echo "  $(GREEN)docker-run$(RESET)      - 🚀 Run Docker container"
-	@echo "  $(GREEN)docker-clean$(RESET)    - 🧹 Clean Docker artifacts"
+	@echo "  $(GREEN)docker-build$(RESET)    - 🏗️  Сборка Docker образа"
+	@echo "  $(GREEN)docker-run$(RESET)      - 🚀 Запуск Docker контейнера"
+	@echo "  $(GREEN)docker-clean$(RESET)    - 🧹 Очистка Docker артефактов"
 	@echo ""
-	@echo "$(BOLD)📚 Documentation:$(RESET)"
-	@echo "  $(GREEN)docs$(RESET)            - 📖 Generate documentation"
-	@echo "  $(GREEN)docs-serve$(RESET)      - 🌐 Serve docs locally"
+	@echo "$(BOLD)📚 Документация:$(RESET)"
+	@echo "  $(GREEN)docs$(RESET)            - 📖 Генерация документации"
+	@echo "  $(GREEN)docs-serve$(RESET)      - 🌐 Локальный сервер документации"
 	@echo ""
-	@echo "$(BOLD)🚀 Deployment:$(RESET)"
-	@echo "  $(GREEN)run$(RESET)             - 🏃 Run development server"
-	@echo "  $(GREEN)run-prod$(RESET)        - 🏭 Run production server"
-	@echo "  $(GREEN)release$(RESET)         - 🎉 Create new release (with Commitizen)"
+	@echo "$(BOLD)🚀 Развёртывание:$(RESET)"
+	@echo "  $(GREEN)run$(RESET)             - 🏃 Запуск dev сервера"
+	@echo "  $(GREEN)run-prod$(RESET)        - 🏭 Запуск production сервера"
+	@echo "  $(GREEN)release$(RESET)         - 🎉 Создание нового релиза (с Commitizen)"
 	@echo ""
-	@echo "$(BOLD)🎯 Workflows:$(RESET)"
-	@echo "  $(GREEN)fix$(RESET)             - 🔧 Auto-fix all issues (format + lint --fix)"
-	@echo "  $(GREEN)ci$(RESET)              - 🤖 Run CI pipeline locally"
-	@echo "  $(GREEN)all$(RESET)             - 🎪 Full workflow (clean + install + check + test)"
+	@echo "$(BOLD)🎯 Рабочие процессы:$(RESET)"
+	@echo "  $(GREEN)fix$(RESET)             - 🔧 Автоисправление всех проблем (format + lint --fix)"
+	@echo "  $(GREEN)ci$(RESET)              - 🤖 Локальный запуск CI пайплайна"
+	@echo "  $(GREEN)all$(RESET)             - 🎪 Полный рабочий процесс (clean + install + check + test)"
 
-# ==================== 📦 INSTALLATION & SETUP ====================
+# ==================== 📦 УСТАНОВКА И НАСТРОЙКА ====================
 
 setup: install-uv install-deps install-pre-commit
-	@echo "$(GREEN)✅ Project setup complete!$(RESET)"
+	@echo "$(GREEN)✅ Настройка проекта завершена!$(RESET)"
 
 install-uv:
-	@echo "$(CYAN)📦 Installing UV package manager...$(RESET)"
+	@echo "$(CYAN)📦 Установка менеджера пакетов UV...$(RESET)"
 	@command -v uv >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
 
 install: install-deps
 
 install-deps:
-	@echo "$(CYAN)📥 Installing dependencies...$(RESET)"
+	@echo "$(CYAN)📥 Установка зависимостей...$(RESET)"
 	$(UV) sync
 
 dev: install-deps
-	@echo "$(CYAN)🔧 Installing development dependencies...$(RESET)"
+	@echo "$(CYAN)🔧 Установка зависимостей разработки...$(RESET)"
 	$(UV) sync --group dev
 
 install-pre-commit:
-	@echo "$(CYAN)🪝 Installing pre-commit hooks...$(RESET)"
+	@echo "$(CYAN)🪝 Установка pre-commit хуков...$(RESET)"
 	$(UV) run pre-commit install
 	$(UV) run pre-commit install --hook-type commit-msg
 
 clean:
-	@echo "$(YELLOW)🧹 Cleaning cache and temporary files...$(RESET)"
+	@echo "$(YELLOW)🧹 Очистка кэша и временных файлов...$(RESET)"
 	rm -rf build/ dist/ *.egg-info/ .coverage htmlcov/ .pytest_cache/ .ruff_cache/ .mypy_cache/
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
@@ -99,149 +99,149 @@ clean:
 	find . -type f -name ".coverage" -delete
 	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
 
-# ==================== ✅ CODE QUALITY (2025 STACK) ====================
+# ==================== ✅ КАЧЕСТВО КОДА (СТЕК 2025) ====================
 
-# 🎯 Modern all-in-one check command
+# 🎯 Современная команда для всех проверок
 check: lint types security test-fast
-	@echo "$(GREEN)✅ All checks passed!$(RESET)"
+	@echo "$(GREEN)✅ Все проверки пройдены!$(RESET)"
 
-# 🎯 Linting with modern Ruff (replaces Flake8, Black, isort, pyupgrade)
+# 🎯 Линтинг с современным Ruff (заменяет Flake8, Black, isort, pyupgrade)
 lint:
-	@echo "$(CYAN)🎯 Linting with Ruff...$(RESET)"
+	@echo "$(CYAN)🎯 Проверка кода с Ruff...$(RESET)"
 	$(UV) run ruff check $(SRC_DIR) $(TESTS_DIR)
 
-# 🔬 Type checking with Pyright (faster than MyPy)
+# 🔬 Проверка типов с Pyright (быстрее чем MyPy)
 types:
-	@echo "$(CYAN)🔬 Type checking with Pyright...$(RESET)"
+	@echo "$(CYAN)🔬 Проверка типов с Pyright...$(RESET)"
 	$(UV) run pyright $(SRC_DIR) $(TESTS_DIR)
 
-# 🔒 Security scanning
+# 🔒 Сканирование безопасности
 security:
-	@echo "$(CYAN)🔒 Running security scans...$(RESET)"
-	@echo "  🔍 Scanning for secrets with GitLeaks..."
+	@echo "$(CYAN)🔒 Запуск сканирования безопасности...$(RESET)"
+	@echo "  🔍 Сканирование секретов с GitLeaks..."
 	$(UV) run gitleaks detect --source . --verbose
-	@echo "  🛡️  Scanning for vulnerabilities with Bandit..."
+	@echo "  🛡️  Сканирование уязвимостей с Bandit..."
 	$(UV) run bandit -r $(SRC_DIR) -ll -f txt
 
-# ✨ Code formatting
+# ✨ Форматирование кода
 format:
-	@echo "$(CYAN)✨ Formatting code with Ruff...$(RESET)"
+	@echo "$(CYAN)✨ Форматирование кода с Ruff...$(RESET)"
 	$(UV) run ruff format $(SRC_DIR) $(TESTS_DIR)
 
-# 🔧 Auto-fix issues
+# 🔧 Автоисправление проблем
 fix:
-	@echo "$(CYAN)🔧 Auto-fixing issues...$(RESET)"
+	@echo "$(CYAN)🔧 Автоисправление проблем...$(RESET)"
 	$(UV) run ruff check --fix $(SRC_DIR) $(TESTS_DIR)
 	$(UV) run ruff format $(SRC_DIR) $(TESTS_DIR)
 
-# 🪝 Pre-commit hooks
+# 🪝 Pre-commit хуки
 pre-commit:
-	@echo "$(CYAN)🪝 Running pre-commit hooks...$(RESET)"
+	@echo "$(CYAN)🪝 Запуск pre-commit хуков...$(RESET)"
 	$(UV) run pre-commit run --all-files
 
 pre-commit-update:
-	@echo "$(CYAN)🔄 Updating pre-commit hooks...$(RESET)"
+	@echo "$(CYAN)🔄 Обновление pre-commit хуков...$(RESET)"
 	$(UV) run pre-commit autoupdate
 
-# ==================== 🧪 TESTING ====================
+# ==================== 🧪 ТЕСТИРОВАНИЕ ====================
 
 test:
-	@echo "$(CYAN)🧪 Running tests...$(RESET)"
+	@echo "$(CYAN)🧪 Запуск тестов...$(RESET)"
 	$(UV) run pytest $(TESTS_DIR) -v
 
 test-fast:
-	@echo "$(CYAN)⚡ Running fast tests...$(RESET)"
+	@echo "$(CYAN)⚡ Запуск быстрых тестов...$(RESET)"
 	$(UV) run pytest $(TESTS_DIR) -x --ff -q
 
 test-watch:
-	@echo "$(CYAN)👀 Running tests in watch mode...$(RESET)"
+	@echo "$(CYAN)👀 Запуск тестов в режиме наблюдения...$(RESET)"
 	$(UV) run pytest-watch -- $(TESTS_DIR)
 
 coverage:
-	@echo "$(CYAN)📊 Generating coverage report...$(RESET)"
+	@echo "$(CYAN)📊 Генерация отчёта покрытия...$(RESET)"
 	$(UV) run pytest $(TESTS_DIR) --cov=$(SRC_DIR) --cov-report=html --cov-report=term-missing
-	@echo "$(GREEN)📊 Coverage report: htmlcov/index.html$(RESET)"
+	@echo "$(GREEN)📊 Отчёт покрытия: htmlcov/index.html$(RESET)"
 
 # ==================== 🐳 DOCKER ====================
 
 docker-build:
-	@echo "$(CYAN)🏗️  Building Docker image...$(RESET)"
+	@echo "$(CYAN)🏗️  Сборка Docker образа...$(RESET)"
 	docker build -t $(DOCKER_IMAGE) .
 
 docker-run:
-	@echo "$(CYAN)🚀 Running Docker container...$(RESET)"
+	@echo "$(CYAN)🚀 Запуск Docker контейнера...$(RESET)"
 	docker run -p 8000:8000 --env-file .env $(DOCKER_IMAGE)
 
 docker-clean:
-	@echo "$(YELLOW)🧹 Cleaning Docker artifacts...$(RESET)"
+	@echo "$(YELLOW)🧹 Очистка Docker артефактов...$(RESET)"
 	docker system prune -f
 	docker image prune -f
 
-# ==================== 📚 DOCUMENTATION ====================
+# ==================== 📚 ДОКУМЕНТАЦИЯ ====================
 
 docs:
-	@echo "$(CYAN)📖 Generating documentation...$(RESET)"
+	@echo "$(CYAN)📖 Генерация документации...$(RESET)"
 	$(UV) run mkdocs build
 
 docs-serve:
-	@echo "$(CYAN)🌐 Serving documentation locally...$(RESET)"
+	@echo "$(CYAN)🌐 Запуск локального сервера документации...$(RESET)"
 	$(UV) run mkdocs serve
 
-# ==================== 🚀 RUNNING & DEPLOYMENT ====================
+# ==================== 🚀 ЗАПУСК И РАЗВЁРТЫВАНИЕ ====================
 
 run:
-	@echo "$(CYAN)🏃 Starting development server...$(RESET)"
+	@echo "$(CYAN)🏃 Запуск сервера разработки...$(RESET)"
 	@if [ -f .env ]; then \
 		export $$(grep -v '^#' .env | xargs -0) && \
 		HOST=$${API_HOST:-0.0.0.0} && \
 		PORT=$${API_PORT:-8000} && \
-		echo "$(GREEN)🚀 Server running on $$HOST:$$PORT$(RESET)" && \
+		echo "$(GREEN)🚀 Сервер запущен на $$HOST:$$PORT$(RESET)" && \
 		$(UV) run uvicorn $(SRC_DIR).main:app --host $$HOST --port $$PORT --reload; \
 	else \
-		echo "$(YELLOW)⚠️  .env file not found. Using defaults.$(RESET)" && \
+		echo "$(YELLOW)⚠️  Файл .env не найден. Используются значения по умолчанию.$(RESET)" && \
 		$(UV) run uvicorn $(SRC_DIR).main:app --host 0.0.0.0 --port 8000 --reload; \
 	fi
 
 run-prod:
-	@echo "$(CYAN)🏭 Starting production server...$(RESET)"
+	@echo "$(CYAN)🏭 Запуск production сервера...$(RESET)"
 	$(UV) run uvicorn $(SRC_DIR).main:app --host 0.0.0.0 --port 8000 --workers 4
 
-# 🎉 Release management with Commitizen
+# 🎉 Управление релизами с Commitizen
 release:
-	@echo "$(CYAN)🎉 Creating new release...$(RESET)"
+	@echo "$(CYAN)🎉 Создание нового релиза...$(RESET)"
 	$(UV) run cz bump --changelog
 
 release-dry:
-	@echo "$(CYAN)🔍 Dry run release...$(RESET)"
+	@echo "$(CYAN)🔍 Тестовый запуск релиза...$(RESET)"
 	$(UV) run cz bump --dry-run
 
-# ==================== 🎯 WORKFLOWS ====================
+# ==================== 🎯 РАБОЧИЕ ПРОЦЕССЫ ====================
 
-# 🤖 CI pipeline simulation
+# 🤖 Симуляция CI пайплайна
 ci: clean install check coverage
-	@echo "$(GREEN)✅ CI pipeline completed successfully!$(RESET)"
+	@echo "$(GREEN)✅ CI пайплайн успешно завершён!$(RESET)"
 
-# 🎪 Complete development workflow
+# 🎪 Полный рабочий процесс разработки
 all: clean install check test coverage
-	@echo "$(GREEN)🎉 All tasks completed successfully!$(RESET)"
+	@echo "$(GREEN)🎉 Все задачи успешно выполнены!$(RESET)"
 
-# 📊 Project status
+# 📊 Статус проекта
 status:
-	@echo "$(BOLD)$(CYAN)📊 Project Status$(RESET)"
+	@echo "$(BOLD)$(CYAN)📊 Статус проекта$(RESET)"
 	@echo "$(CYAN)Python:$(RESET)     $$(python --version 2>&1)"
-	@echo "$(CYAN)UV:$(RESET)         $$(uv --version 2>&1 || echo 'Not installed')"
-	@echo "$(CYAN)Project:$(RESET)    $(PROJECT_NAME)"
-	@echo "$(CYAN)Directory:$(RESET)  $$(pwd)"
-	@echo "$(CYAN)Git:$(RESET)        $$(git branch --show-current 2>/dev/null || echo 'Not a git repo')"
+	@echo "$(CYAN)UV:$(RESET)         $$(uv --version 2>&1 || echo 'Не установлен')"
+	@echo "$(CYAN)Проект:$(RESET)     $(PROJECT_NAME)"
+	@echo "$(CYAN)Каталог:$(RESET)    $$(pwd)"
+	@echo "$(CYAN)Git:$(RESET)        $$(git branch --show-current 2>/dev/null || echo 'Не git репозиторий')"
 
-# 🔧 Development environment check
+# 🔧 Проверка среды разработки
 check-env:
-	@echo "$(CYAN)🔧 Checking development environment...$(RESET)"
+	@echo "$(CYAN)🔧 Проверка среды разработки...$(RESET)"
 	$(UV) run python scripts/check_setup.py
 
-# ==================== 📱 SHORTCUTS ====================
+# ==================== 📱 БЫСТРЫЕ КОМАНДЫ ====================
 
-# Quick aliases for common commands
+# Быстрые алиасы для общих команд
 l: lint
 t: test
 c: check
