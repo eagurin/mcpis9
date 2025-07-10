@@ -19,10 +19,18 @@ jobs:
 
       - name: Call Gemini Agent
         if: contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')
+        id: gemini
         uses: google-gemini/gemini-cli-action@main
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          prompt: reply --comment-body '''@agent What is the capital of Japan?'''
+          prompt: "${{ github.event.comment.body }}"
+
+      - name: Comment on issue
+        if: (contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')) && steps.gemini.outputs.reply
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: ${{ steps.gemini.outputs.reply }}
 
       - name: Call Claude Agent
         if: contains(github.event.comment.body, 'claude')
