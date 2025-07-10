@@ -21,8 +21,7 @@ jobs:
         if: contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')
         uses: google-gemini/gemini-cli-action@main
         with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          command: "reply --comment-body '''${{ github.event.comment.body }}'''"
+          prompt: "reply --comment-body '''${{ github.event.comment.body }}'''"
 
       - name: Call Claude Agent
         if: contains(github.event.comment.body, 'claude')
