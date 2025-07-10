@@ -885,7 +885,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mcpisia"
+name = "mcpis9"
 version = "0.2.0"
 source = { editable = "." }
 dependencies = [

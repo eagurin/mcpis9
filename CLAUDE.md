@@ -4,7 +4,7 @@
 
 ## Обзор Проекта
 
-MCPISIA - это Python-based MCP (Model Context Protocol) сервер с возможностями оркестрации GitHub агентов. Проект использует современный Python 3.12+ с FastAPI, интегрируется с Anthropic Claude API и предоставляет автоматизацию GitHub через PyGithub.
+MCPIS9 - это Python-based MCP (Model Context Protocol) сервер с возможностями оркестрации GitHub агентов. Проект использует современный Python 3.12+ с FastAPI, интегрируется с Anthropic Claude API и предоставляет автоматизацию GitHub через PyGithub.
 
 ## Команды Разработки
 
@@ -64,7 +64,7 @@ uvicorn app.main:app --reload --port 8000
 
 Три точки входа CLI определены в `pyproject.toml`:
 
-- `mcpisia-server` - Основное MCP серверное приложение
+- `mcpis9-server` - Основное MCP серверное приложение
 - `github-orchestrator` - Оркестрация GitHub агентов
 - `agent-cli` - Общий CLI интерфейс
 

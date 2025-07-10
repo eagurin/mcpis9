@@ -7,7 +7,7 @@
 # 🔧 Конфигурация
 PYTHON := python3
 UV := uv
-PROJECT_NAME := mcpisia
+PROJECT_NAME := mcpis9
 SRC_DIR := app
 TESTS_DIR := tests
 DOCKER_IMAGE := $(PROJECT_NAME):latest

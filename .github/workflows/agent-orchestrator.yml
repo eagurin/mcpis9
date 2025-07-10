@@ -1,0 +1,33 @@
+name: Agent Orchestrator
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  orchestrator:
+    if: contains(github.event.comment.body, '@agent')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Call Gemini Agent
+        if: contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')
+        uses: google-gemini/gemini-cli-action@v1
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          command: "reply --comment-body '''${{ github.event.comment.body }}'''"
+
+      - name: Call Claude Agent
+        if: contains(github.event.comment.body, 'claude')
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # We need to pass the comment body to the action
+          direct_prompt: ${{ github.event.comment.body }}

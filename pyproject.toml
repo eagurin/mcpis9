@@ -3,14 +3,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcpisia"
+name = "mcpis9"
 version = "0.2.0"
 description = "MCP implementation with GitHub Agent Orchestrator"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {file = "LICENSE"}
 authors = [
-    {name = "MCPISIA Team"},
+    {name = "MCPIS9 Team"},
 ]
 keywords = ["mcp", "github", "ai", "claude", "orchestration", "automation"]
 classifiers = [
@@ -70,9 +70,9 @@ Issues = "https://github.com/eagurin/mcpis9/issues"
 packages = ["src"]
 
 [project.scripts]
-mcpisia-server = "mcpisia.server:main"
-github-orchestrator = "mcpisia.agents.github:main"
-agent-cli = "mcpisia.cli:main"
+mcpis9-server = "mcpis9.server:main"
+github-orchestrator = "mcpis9.agents.github:main"
+agent-cli = "mcpis9.cli:main"
 
 # 🐍 Modern Ruff configuration (replaces Black, Flake8, isort, pyupgrade, bandit)
 [tool.ruff]
@@ -136,7 +136,7 @@ ignore = [
 "scripts/**/*" = ["T201", "S603", "S607"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["mcpisia"]
+known-first-party = ["mcpis9"]
 force-sort-within-sections = true
 
 [tool.ruff.format]
