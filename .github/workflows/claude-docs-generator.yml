@@ -1,0 +1,311 @@
+name: Claude Documentation Generator
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "app/**/*.py"
+      - "README.md"
+      - "CLAUDE.md"
+      - "pyproject.toml"
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "app/**/*.py"
+      - "docs/**/*"
+  workflow_dispatch:
+    inputs:
+      doc_type:
+        description: 'Type of documentation to generate'
+        required: true
+        default: 'comprehensive'
+        type: choice
+        options:
+          - 'comprehensive'
+          - 'api-only'
+          - 'user-guide'
+          - 'developer-guide'
+      update_existing:
+        description: 'Update existing documentation'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  generate-documentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Documentation with Claude
+        id: docs-generator
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          prompt: |
+            Generate comprehensive documentation for this MCPIS9 Python MCP server project:
+
+            ## Documentation Requirements
+
+            ### 1. Project Overview Documentation
+            - Update README.md with clear project description
+            - Explain MCP (Model Context Protocol) server functionality
+            - Document key features and capabilities
+            - Add installation and quick start guide
+
+            ### 2. API Documentation
+            - Document all FastAPI endpoints (if any)
+            - Create OpenAPI/Swagger documentation
+            - Include request/response examples
+            - Document authentication and error handling
+
+            ### 3. Developer Documentation
+            - Code architecture and structure explanation
+            - Development setup and workflow
+            - Contributing guidelines
+            - Code style and standards
+
+            ### 4. User Guide
+            - How to use the MCP server
+            - Configuration options
+            - Integration examples
+            - Troubleshooting guide
+
+            ### 5. Technical Documentation
+            - Dependencies and requirements
+            - Environment variables
+            - Deployment instructions
+            - Performance considerations
+
+            ## Specific Tasks
+            1. **Analyze the codebase** to understand current functionality
+            2. **Review existing documentation** (README.md, CLAUDE.md)
+            3. **Generate missing documentation** based on code analysis
+            4. **Create examples** for common use cases
+            5. **Update project metadata** in pyproject.toml if needed
+
+            ## Output Format
+            - Use clear markdown formatting
+            - Include code examples with syntax highlighting
+            - Add diagrams where helpful (mermaid)
+            - Structure content logically with proper headings
+            - Include table of contents for long documents
+
+            ## Focus Areas
+            - MCP server implementation details
+            - FastAPI integration
+            - Python 3.12+ features usage
+            - UV package management
+            - Development workflow with Makefile
+
+            Generate documentation that is professional, comprehensive, and user-friendly.
+
+          allowed_tools: |
+            View
+            GlobTool
+            GrepTool
+            Edit
+            Write
+            Bash(find . -name "*.py" -type f)
+            Bash(find . -name "*.md" -type f)
+            Bash(find . -name "*.toml" -type f)
+            Bash(find . -name "*.yml" -type f)
+            Bash(find . -name "*.yaml" -type f)
+            Bash(find . -name "Makefile" -type f)
+            Bash(uv run python -c "import app; help(app)")
+            Bash(uv run python -m app --help)
+            Bash(ls -la)
+            Bash(tree -I "__pycache__|*.pyc|.git|node_modules")
+            Bash(wc -l app/**/*.py)
+            Bash(grep -r "class\|def\|async def" app/ --include="*.py")
+
+          claude_env: |
+            PYTHON_VERSION: 3.12
+            UV_PYTHON: 3.12
+            PROJECT_NAME: MCPIS9
+            PROJECT_TYPE: MCP_SERVER
+            FRAMEWORK: FastAPI
+            PACKAGE_MANAGER: UV
+            DOC_TYPE: ${{ inputs.doc_type || 'comprehensive' }}
+            UPDATE_EXISTING: ${{ inputs.update_existing || 'true' }}
+
+          system_prompt: |
+            You are a technical documentation expert specializing in Python and API documentation.
+            Your goal is to create comprehensive, accurate, and user-friendly documentation.
+
+            Key principles:
+            1. **Accuracy**: Base documentation on actual code analysis
+            2. **Clarity**: Use clear, concise language with good examples
+            3. **Completeness**: Cover all important aspects of the project
+            4. **Structure**: Organize information logically
+            5. **Maintainability**: Create documentation that's easy to update
+
+            For this MCP server project:
+            - Focus on MCP protocol implementation
+            - Explain FastAPI integration clearly
+            - Document Python 3.12+ features used
+            - Include practical examples
+            - Make it accessible to both users and developers
+
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          model: "claude-3-7-sonnet-20250219-beta"
+          fallback_model: "claude-3-5-sonnet-20241022"
+          max_turns: "10"
+          timeout_minutes: "18"
+
+          # Security restrictions for documentation generation
+          disallowed_tools: |
+            Bash(rm:*)
+            Bash(sudo:*)
+            Bash(chmod:*)
+            Bash(kill:*)
+            TaskOutput
+            KillTask
+
+      - name: Process Documentation Results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Get execution results
+            const executionFile = '${{ steps.docs-generator.outputs.execution_file }}';
+            const conclusion = '${{ steps.docs-generator.outputs.conclusion }}';
+
+            let docResults = '';
+
+            if (fs.existsSync(executionFile)) {
+              const executionLog = JSON.parse(fs.readFileSync(executionFile, 'utf8'));
+
+              // Extract documentation results
+              for (let i = executionLog.length - 1; i >= 0; i--) {
+                if (executionLog[i].role === 'assistant') {
+                  docResults = executionLog[i].content;
+                  break;
+                }
+              }
+            }
+
+            // Determine status
+            const isSuccess = conclusion === 'success';
+            const statusEmoji = isSuccess ? '📚' : '⚠️';
+            const statusText = isSuccess ? 'COMPLETED' : 'FAILED';
+
+            // Create summary
+            const summary = `## ${statusEmoji} Documentation Generation - ${statusText}
+
+            **Status**: ${statusText}
+            **Type**: ${{ inputs.doc_type || 'comprehensive' }}
+            **Project**: MCPIS9 MCP Server
+            **Framework**: FastAPI + Python 3.12
+
+            ---
+
+            ${docResults || 'Documentation generation completed but detailed results are not available.'}
+
+            ---
+
+            **Files Updated**:
+            - README.md (project overview)
+            - API documentation
+            - Developer guides
+            - User documentation
+
+            **Next Steps**:
+            ${isSuccess ?
+              '- ✅ Documentation updated successfully\n- Review generated content\n- Consider adding to project wiki\n- Update version in changelog' :
+              '- ❌ Documentation generation failed\n- Check logs for errors\n- Retry with different parameters'
+            }
+
+            *Generated by Claude Documentation Generator*`;
+
+            // Post comment on PR or commit
+            if (context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: summary
+              });
+            } else if (context.payload.commits) {
+              // For push events, create a commit comment
+              const sha = context.payload.after;
+              await github.rest.repos.createCommitComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: sha,
+                body: summary
+              });
+            }
+
+            // Set job summary
+            await core.summary
+              .addHeading(`Documentation Generation - ${statusText}`)
+              .addRaw(docResults || 'No detailed results available')
+              .write();
+
+      - name: Create Documentation PR
+        if: steps.docs-generator.outputs.conclusion == 'success' && github.event_name == 'workflow_dispatch'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            docs: Update documentation via Claude Generator
+
+            - Generated comprehensive documentation
+            - Updated README.md and API docs
+            - Added developer and user guides
+            - Enhanced project documentation structure
+
+            🤖 Generated with Claude Code Documentation Generator
+
+            Co-Authored-By: Claude <noreply@anthropic.com>
+          title: "📚 Documentation Update - Claude Generated"
+          body: |
+            ## Documentation Update
+
+            This PR contains automatically generated documentation updates using Claude Code.
+
+            ### Changes Made:
+            - ✅ Updated README.md with project overview
+            - ✅ Generated API documentation
+            - ✅ Created developer guides
+            - ✅ Added user documentation
+            - ✅ Enhanced project structure documentation
+
+            ### Review Notes:
+            - Please review all generated content for accuracy
+            - Check that examples work as expected
+            - Verify links and references are correct
+            - Consider adding project-specific details
+
+            ### Documentation Type: ${{ inputs.doc_type || 'comprehensive' }}
+
+            Generated by Claude Documentation Generator workflow.
+          branch: docs/claude-generated-${{ github.run_number }}
+          delete-branch: true
+
+      - name: Archive Documentation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-${{ github.run_number }}
+          path: |
+            README.md
+            docs/
+            *.md
+            api-docs/
+          retention-days: 30
+          if-no-files-found: ignore

@@ -25,20 +25,12 @@ jobs:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           prompt: "${{ github.event.comment.body }}"
 
-      - name: Process Gemini Output
-        id: process_gemini_output
-        if: (contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')) && steps.gemini.outputs.stdout
-        run: |
-          output="${{ steps.gemini.outputs.stdout }}"
-          processed_output=$(echo "$output" | sed 's/^.*is //')
-          echo "reply=$processed_output" >> "$GITHUB_OUTPUT"
-
       - name: Comment on issue
         if: (contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')) && steps.gemini.outputs.stdout
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: ${{ steps.process_gemini_output.outputs.reply }}
+          body: ${{ steps.gemini.outputs.stdout }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Call Claude Agent

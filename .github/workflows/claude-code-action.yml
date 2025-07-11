@@ -1,0 +1,193 @@
+name: Claude Assistant
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned, labeled]
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  id-token: write  # Required for OIDC authentication
+
+jobs:
+  claude-response:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full repo history for comprehensive analysis
+
+      - uses: anthropics/claude-code-action@beta
+        with:
+          # Authentication - OAuth token preferred for Pro/Max users
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Model configuration - Claude 3.7 Sonnet with fallback
+          model: "claude-3-7-sonnet-20250219-beta"
+          fallback_model: "claude-3-5-sonnet-20241022"
+
+          # Execution limits
+          max_turns: "12"
+          timeout_minutes: "40"
+
+          # Python MCP server configuration
+          mcp_config: |
+            {
+              "mcpServers": {
+                "python-tools": {
+                  "type": "stdio",
+                  "command": "uv",
+                  "args": [
+                    "--directory",
+                    "${{ github.workspace }}/",
+                    "run",
+                    "python",
+                    "-m",
+                    "mcp_server"
+                  ],
+                  "env": {
+                    "PYTHONPATH": "${{ github.workspace }}",
+                    "UV_PYTHON": "3.12"
+                  }
+                }
+              }
+            }
+
+          # Enhanced tool permissions for Python FastAPI development
+          allowed_tools: |
+            Bash(make:*)
+            Bash(uv:*)
+            Bash(pytest:*)
+            Bash(uvicorn:*)
+            Bash(python:*)
+            Bash(pip:*)
+            Bash(git:status)
+            Bash(git:diff)
+            Bash(git:log)
+            Bash(git:show)
+            Bash(curl:*)
+            Bash(find:*)
+            Bash(grep:*)
+            Bash(tree:*)
+            Bash(ls:*)
+            Bash(cat:*)
+            Bash(head:*)
+            Bash(tail:*)
+            Edit
+            Replace
+            MultiEdit
+            Write
+            View
+            GlobTool
+            GrepTool
+            NotebookEditCell
+            mcp__python-tools__*
+
+          # Restricted tools for security
+          disallowed_tools: |
+            Bash(rm:*)
+            Bash(sudo:*)
+            Bash(chmod:*)
+            Bash(chown:*)
+            Bash(kill:*)
+            Bash(killall:*)
+            TaskOutput
+            KillTask
+
+          # Environment configuration
+          claude_env: |
+            PYTHON_VERSION: 3.12
+            UV_PYTHON: 3.12
+            PYTHONPATH: /github/workspace
+            CI: true
+            GITHUB_ACTIONS: true
+            PROJECT_TYPE: MCP_SERVER
+            FRAMEWORK: FastAPI
+            PACKAGE_MANAGER: UV
+            TESTING_FRAMEWORK: pytest
+            LINTER: ruff
+            TYPE_CHECKER: pyright
+            FORMATTER: ruff
+            SECURITY_SCANNER: bandit
+
+          # Enhanced permissions for CI/CD integration
+          additional_permissions: |
+            actions: read
+
+          # Comprehensive custom instructions
+          custom_instructions: |
+            You are an expert Python developer specializing in FastAPI MCP servers with the following project context:
+
+            ## Project: MCPIS9 - Python MCP Server
+            - **Language**: Python 3.12+
+            - **Framework**: FastAPI
+            - **Package Manager**: UV (modern Python package manager)
+            - **Testing**: pytest with coverage
+            - **Code Quality**: ruff (linting + formatting), pyright (type checking), bandit (security)
+            - **Architecture**: MCP (Model Context Protocol) server implementation
+
+            ## Development Workflow
+            1. **Code Quality First**: Always run `make check` before completing tasks
+            2. **Type Safety**: Use type hints for all functions and ensure pyright compliance
+            3. **Testing**: Write/update tests for new functionality, maintain 80%+ coverage
+            4. **Documentation**: Update docstrings and README for significant changes
+            5. **Security**: Follow security best practices, scan with bandit
+
+            ## Available Commands (via Makefile)
+            - `make setup` - Initial project setup
+            - `make install` - Install dependencies
+            - `make dev` - Install dev dependencies
+            - `make lint` - Run ruff linting
+            - `make fix` - Auto-fix linting issues
+            - `make types` - Run pyright type checking
+            - `make test` - Run pytest with coverage
+            - `make test-fast` - Run tests without coverage
+            - `make coverage` - Generate coverage reports
+            - `make security` - Run bandit security scan
+            - `make check` - Run all quality checks
+            - `make run` - Start the MCP server
+
+            ## Code Standards
+            - Follow PEP 8 and modern Python practices
+            - Use async/await for I/O operations
+            - Implement proper error handling
+            - Add comprehensive logging
+            - Use Pydantic models for data validation
+            - Follow FastAPI best practices
+
+            ## When Reviewing Code
+            - Check for type safety and proper annotations
+            - Verify error handling and edge cases
+            - Ensure tests cover new functionality
+            - Validate security implications
+            - Review performance considerations
+            - Check for proper documentation
+
+            ## When Implementing Features
+            - Start with understanding requirements
+            - Design the API interface first
+            - Implement with proper typing
+            - Add comprehensive tests
+            - Update documentation
+            - Run full quality checks
+
+            Always prioritize code quality, security, and maintainability. Use the project's established patterns and conventions.
+
+          # Trigger configuration
+          trigger_phrase: "@claude"
+          assignee_trigger: "claude"
+          label_trigger: "claude"
+
+          # Use sticky comments for cleaner PR discussions
+          use_sticky_comment: true
