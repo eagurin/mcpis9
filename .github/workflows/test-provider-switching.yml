@@ -1,0 +1,153 @@
+name: Test Provider Switching
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider_order:
+        description: 'Test provider switching order'
+        required: false
+        default: 'claude-first'
+        type: choice
+        options:
+          - claude-first
+          - gemini-first
+          - both-parallel
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+
+jobs:
+  test-claude-first:
+    if: github.event.inputs.provider_order == 'claude-first' || github.event.inputs.provider_order == '' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    name: Test Claude then Gemini
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test Claude Provider First
+        id: claude-test
+        uses: ./
+        with:
+          ai_provider: claude
+          trigger_phrase: "@claude-first"
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          custom_instructions: "First test: Analyze repository structure as Claude"
+          direct_prompt: "Please provide a brief analysis of this repository structure."
+          timeout_minutes: 5
+          max_turns: 2
+          use_sticky_comment: false
+
+      - name: Test Gemini Provider Second
+        id: gemini-test
+        uses: ./
+        with:
+          ai_provider: gemini
+          trigger_phrase: "@gemini-second"
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_prompt: "Second test: Analyze repository structure as Gemini"
+          gemini_version: "latest"
+          timeout_minutes: 5
+          use_sticky_comment: false
+
+      - name: Compare Results
+        run: |
+          echo "=== Provider Switching Test Results ==="
+          echo "Claude test outcome: ${{ steps.claude-test.outcome }}"
+          echo "Gemini test outcome: ${{ steps.gemini-test.outcome }}"
+
+          if [ "${{ steps.claude-test.outcome }}" == "success" ] && [ "${{ steps.gemini-test.outcome }}" == "success" ]; then
+            echo "✅ Both providers executed successfully in sequence"
+          else
+            echo "❌ Provider switching test failed"
+            exit 1
+          fi
+
+  test-gemini-first:
+    if: github.event.inputs.provider_order == 'gemini-first'
+    runs-on: ubuntu-latest
+    name: Test Gemini then Claude
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test Gemini Provider First
+        id: gemini-test
+        uses: ./
+        with:
+          ai_provider: gemini
+          trigger_phrase: "@gemini-first"
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_prompt: "First test: Analyze repository structure as Gemini"
+          gemini_version: "latest"
+          timeout_minutes: 5
+          use_sticky_comment: false
+
+      - name: Test Claude Provider Second
+        id: claude-test
+        uses: ./
+        with:
+          ai_provider: claude
+          trigger_phrase: "@claude-second"
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          custom_instructions: "Second test: Analyze repository structure as Claude"
+          direct_prompt: "Please provide a brief analysis of this repository structure."
+          timeout_minutes: 5
+          max_turns: 2
+          use_sticky_comment: false
+
+      - name: Compare Results
+        run: |
+          echo "=== Provider Switching Test Results ==="
+          echo "Gemini test outcome: ${{ steps.gemini-test.outcome }}"
+          echo "Claude test outcome: ${{ steps.claude-test.outcome }}"
+
+          if [ "${{ steps.gemini-test.outcome }}" == "success" ] && [ "${{ steps.claude-test.outcome }}" == "success" ]; then
+            echo "✅ Both providers executed successfully in sequence"
+          else
+            echo "❌ Provider switching test failed"
+            exit 1
+          fi
+
+  test-parallel:
+    if: github.event.inputs.provider_order == 'both-parallel'
+    runs-on: ubuntu-latest
+    name: Test Both Providers in Parallel
+
+    strategy:
+      matrix:
+        provider: [claude, gemini]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test ${{ matrix.provider }} Provider
+        id: ai-test
+        uses: ./
+        with:
+          ai_provider: ${{ matrix.provider }}
+          trigger_phrase: "@${{ matrix.provider }}-parallel"
+          anthropic_api_key: ${{ matrix.provider == 'claude' && secrets.CLAUDE_CODE_OAUTH_TOKEN || '' }}
+          gemini_api_key: ${{ matrix.provider == 'gemini' && secrets.GEMINI_API_KEY || '' }}
+          custom_instructions: ${{ matrix.provider == 'claude' && 'Parallel test - Analyze repository structure as Claude' || '' }}
+          direct_prompt: ${{ matrix.provider == 'claude' && 'Please provide a brief analysis of this repository structure.' || '' }}
+          gemini_prompt: ${{ matrix.provider == 'gemini' && 'Parallel test - Analyze repository structure as Gemini' || '' }}
+          gemini_version: ${{ matrix.provider == 'gemini' && 'latest' || '' }}
+          timeout_minutes: 5
+          max_turns: ${{ matrix.provider == 'claude' && '2' || '' }}
+          use_sticky_comment: false
+
+      - name: Report Results
+        run: |
+          echo "=== ${{ matrix.provider }} Provider Test Results ==="
+          echo "Test outcome: ${{ steps.ai-test.outcome }}"
+
+          if [ "${{ steps.ai-test.outcome }}" == "success" ]; then
+            echo "✅ ${{ matrix.provider }} provider test passed"
+          else
+            echo "❌ ${{ matrix.provider }} provider test failed"
+            exit 1
+          fi

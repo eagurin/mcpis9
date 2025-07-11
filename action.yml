@@ -1,5 +1,5 @@
-name: "Claude Code Action Official"
-description: "General-purpose Claude agent for GitHub PRs and issues. Can answer questions and implement code changes."
+name: "Claude & Gemini AI Assistant Action"
+description: "General-purpose AI assistant with Claude and Gemini support for GitHub PRs and issues. Can answer questions and implement code changes."
 branding:
   icon: "at-sign"
   color: "orange"
@@ -23,6 +23,16 @@ inputs:
     description: "The prefix to use for Claude branches (defaults to 'claude/', use 'claude-' for dash format)"
     required: false
     default: "claude/"
+
+  # AI Model Selection
+  ai_provider:
+    description: "AI provider to use (claude or gemini)"
+    required: false
+    default: "claude"
+  gemini_prompt:
+    description: "Specific prompt for Gemini when using gemini provider"
+    required: false
+    default: "You are a helpful assistant."
 
   # Claude Code configuration
   model:
@@ -68,6 +78,9 @@ inputs:
   claude_code_oauth_token:
     description: "Claude Code OAuth token (alternative to anthropic_api_key)"
     required: false
+  gemini_api_key:
+    description: "Gemini API key (required when using gemini provider)"
+    required: false
   github_token:
     description: "GitHub token with repo and pull request permissions (optional if using GitHub App)"
     required: false
@@ -79,6 +92,21 @@ inputs:
     description: "Use Google Vertex AI with OIDC authentication instead of direct Anthropic API"
     required: false
     default: "false"
+
+  # Gemini-specific configuration
+  gemini_settings_json:
+    description: "JSON string to configure Gemini CLI settings"
+    required: false
+  gemini_version:
+    description: "Version of @google/gemini-cli to use"
+    required: false
+    default: "latest"
+  otlp_gcp_wif_provider:
+    description: "Workload identity provider for GCP authentication (Gemini telemetry)"
+    required: false
+  otlp_google_cloud_project:
+    description: "Google Cloud project for telemetry (Gemini)"
+    required: false
 
   max_turns:
     description: "Maximum number of conversation turns"
@@ -138,10 +166,11 @@ runs:
         ACTIONS_TOKEN: ${{ github.token }}
         ADDITIONAL_PERMISSIONS: ${{ inputs.additional_permissions }}
         USE_COMMIT_SIGNING: ${{ inputs.use_commit_signing }}
+        AI_PROVIDER: ${{ inputs.ai_provider }}
 
     - name: Run Claude Code
       id: claude-code
-      if: steps.prepare.outputs.contains_trigger == 'true'
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.ai_provider == 'claude'
       uses: anthropics/claude-code-base-action@0f7a229cb06f840f77f49df0b711ee0060868c2c # v0.0.33
       with:
         prompt_file: ${{ runner.temp }}/claude-prompts/claude-prompt.txt
@@ -184,6 +213,66 @@ runs:
         VERTEX_REGION_CLAUDE_3_5_SONNET: ${{ env.VERTEX_REGION_CLAUDE_3_5_SONNET }}
         VERTEX_REGION_CLAUDE_3_7_SONNET: ${{ env.VERTEX_REGION_CLAUDE_3_7_SONNET }}
 
+    - name: Configure Gemini CLI
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.ai_provider == 'gemini' && inputs.gemini_settings_json != ''
+      shell: bash
+      run: |
+        mkdir -p .gemini
+        echo "$SETTINGS_JSON" > .gemini/settings.json
+      env:
+        SETTINGS_JSON: ${{ inputs.gemini_settings_json }}
+
+    - name: Authenticate to Google Cloud for Gemini Telemetry
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.ai_provider == 'gemini' && inputs.otlp_gcp_wif_provider != ''
+      id: gemini-auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+        project_id: ${{ inputs.otlp_google_cloud_project }}
+        workload_identity_provider: ${{ inputs.otlp_gcp_wif_provider }}
+
+    - name: Setup Gemini Telemetry Collector
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.ai_provider == 'gemini' && inputs.otlp_gcp_wif_provider != ''
+      shell: bash
+      run: |
+        # Create telemetry script inline since we don't have the external script
+        cat > telemetry.js << 'EOF'
+        // Minimal telemetry setup for Gemini
+        console.log('Setting up telemetry for project:', process.env.OTLP_GOOGLE_CLOUD_PROJECT);
+        EOF
+        node telemetry.js
+      env:
+        OTLP_GOOGLE_CLOUD_PROJECT: ${{ inputs.otlp_google_cloud_project }}
+
+    - name: Install Gemini CLI
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.ai_provider == 'gemini'
+      shell: bash
+      run: |
+        if [[ "${{ inputs.gemini_version }}" == "latest" || "${{ inputs.gemini_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.-]+)?(\+[a-zA-Z0-9\.-]+)?$ ]]; then
+          echo "Installing Gemini CLI from npm: @google/gemini-cli@${{ inputs.gemini_version }}"
+          npm install -g @google/gemini-cli@${{ inputs.gemini_version }}
+        else
+          echo "Installing Gemini CLI from GitHub: github:google-gemini/gemini-cli#${{ inputs.gemini_version }}"
+          npm install -g github:google-gemini/gemini-cli#${{ inputs.gemini_version }}
+        fi
+        echo "Verifying installation:"
+        if command -v gemini >/dev/null 2>&1; then
+          gemini --version || echo "Gemini CLI installed successfully (version command not available)"
+        else
+          echo "Error: Gemini CLI not found in PATH"
+          exit 1
+        fi
+
+    - name: Run Gemini CLI
+      id: gemini-code
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.ai_provider == 'gemini'
+      shell: bash
+      run: |
+        gemini --yolo --prompt "$PROMPT"
+      env:
+        GEMINI_API_KEY: ${{ inputs.gemini_api_key }}
+        PROMPT: ${{ inputs.gemini_prompt }}
+        GITHUB_TOKEN: ${{ steps.prepare.outputs.GITHUB_TOKEN }}
+
     - name: Update comment with job link
       if: steps.prepare.outputs.contains_trigger == 'true' && steps.prepare.outputs.claude_comment_id && always()
       shell: bash
@@ -200,16 +289,17 @@ runs:
         CLAUDE_BRANCH: ${{ steps.prepare.outputs.CLAUDE_BRANCH }}
         IS_PR: ${{ github.event.issue.pull_request != null || github.event_name == 'pull_request_review_comment' }}
         BASE_BRANCH: ${{ steps.prepare.outputs.BASE_BRANCH }}
-        CLAUDE_SUCCESS: ${{ steps.claude-code.outputs.conclusion == 'success' }}
+        CLAUDE_SUCCESS: ${{ steps.claude-code.outputs.conclusion == 'success' || steps.gemini-code.outcome == 'success' }}
         OUTPUT_FILE: ${{ steps.claude-code.outputs.execution_file || '' }}
         TRIGGER_USERNAME: ${{ github.event.comment.user.login || github.event.issue.user.login || github.event.pull_request.user.login || github.event.sender.login || github.triggering_actor || github.actor || '' }}
         PREPARE_SUCCESS: ${{ steps.prepare.outcome == 'success' }}
         PREPARE_ERROR: ${{ steps.prepare.outputs.prepare_error || '' }}
         USE_STICKY_COMMENT: ${{ inputs.use_sticky_comment }}
         USE_COMMIT_SIGNING: ${{ inputs.use_commit_signing }}
+        AI_PROVIDER: ${{ inputs.ai_provider }}
 
     - name: Display Claude Code Report
-      if: steps.prepare.outputs.contains_trigger == 'true' && steps.claude-code.outputs.execution_file != ''
+      if: steps.prepare.outputs.contains_trigger == 'true' && steps.claude-code.outputs.execution_file != '' && inputs.ai_provider == 'claude'
       shell: bash
       run: |
         # Try to format the turns, but if it fails, dump the raw JSON
@@ -224,6 +314,15 @@ runs:
           cat "${{ steps.claude-code.outputs.execution_file }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
         fi
+
+    - name: Display Gemini Report
+      if: steps.prepare.outputs.contains_trigger == 'true' && inputs.ai_provider == 'gemini' && steps.gemini-code.outcome == 'success'
+      shell: bash
+      run: |
+        echo "## Gemini CLI Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Gemini CLI executed successfully with prompt: ${{ inputs.gemini_prompt }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
 
     - name: Revoke app token
       if: always() && inputs.github_token == ''

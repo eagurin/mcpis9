@@ -1,0 +1,50 @@
+name: Test Claude Provider
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_prompt:
+        description: 'Test prompt for Claude'
+        required: false
+        default: 'Hello Claude! Please analyze the current repository structure and create a brief summary.'
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+  issues:
+    types: [opened, edited]
+
+jobs:
+  test-claude:
+    runs-on: ubuntu-latest
+    name: Test Claude AI Provider
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test Claude Provider
+        uses: ./
+        with:
+          ai_provider: claude
+          trigger_phrase: "@claude-test"
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          custom_instructions: |
+            You are testing the Claude provider integration in a GitHub Action.
+            Please respond with a brief analysis of the repository structure.
+          direct_prompt: ${{ inputs.test_prompt }}
+          timeout_minutes: 10
+          max_turns: 3
+          use_sticky_comment: true
+
+      - name: Verify Claude Integration
+        run: |
+          echo "Claude provider test completed"
+          echo "Checking for expected outputs..."
+
+          # Check if Claude execution was successful
+          if [ "${{ steps.test-claude.outcome }}" == "success" ]; then
+            echo "✅ Claude provider test passed"
+          else
+            echo "❌ Claude provider test failed"
+            exit 1
+          fi

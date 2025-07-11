@@ -1,0 +1,54 @@
+name: Test Gemini Provider
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_prompt:
+        description: 'Test prompt for Gemini'
+        required: false
+        default: 'Hello Gemini! Please analyze the current repository structure and create a brief summary.'
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+  issues:
+    types: [opened, edited]
+
+jobs:
+  test-gemini:
+    runs-on: ubuntu-latest
+    name: Test Gemini AI Provider
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test Gemini Provider
+        uses: ./
+        with:
+          ai_provider: gemini
+          trigger_phrase: "@gemini-test"
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_prompt: ${{ inputs.test_prompt }}
+          gemini_version: "latest"
+          gemini_settings_json: |
+            {
+              "telemetry": {
+                "enabled": false
+              },
+              "sandbox": false
+            }
+          timeout_minutes: 10
+          use_sticky_comment: true
+
+      - name: Verify Gemini Integration
+        run: |
+          echo "Gemini provider test completed"
+          echo "Checking for expected outputs..."
+
+          # Check if Gemini execution was successful
+          if [ "${{ steps.test-gemini.outcome }}" == "success" ]; then
+            echo "✅ Gemini provider test passed"
+          else
+            echo "❌ Gemini provider test failed"
+            exit 1
+          fi
