@@ -33,8 +33,10 @@ dependencies = [
     "typing-extensions>=4.14.1",
     "python-dotenv>=1.0.1",
     "structlog>=25.4.0",
-    # GitHub Agent Orchestrator
+    # AI Providers
+    "google-generativeai>=0.8.3",
     "anthropic>=0.57.1",
+    # GitHub Agent Orchestrator
     "PyGithub>=2.6.1",
     "aiohttp>=3.12.14",
     "click>=8.2.1",
@@ -67,12 +69,12 @@ Repository = "https://github.com/eagurin/mcpis9.git"
 Issues = "https://github.com/eagurin/mcpis9/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["app"]
 
 [project.scripts]
-mcpis9-server = "mcpis9.server:main"
-github-orchestrator = "mcpis9.agents.github:main"
-agent-cli = "mcpis9.cli:main"
+mcpis9-server = "app.server:main"
+github-orchestrator = "app.agents.github:main"
+agent-cli = "app.cli:main"
 
 # 🐍 Modern Ruff configuration (replaces Black, Flake8, isort, pyupgrade, bandit)
 [tool.ruff]
