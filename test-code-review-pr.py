@@ -3,8 +3,12 @@ Sample PR file for testing Claude code review workflow
 This file contains various code patterns to test review capabilities
 """
 
+import ast
 import logging
+from pathlib import Path
 from typing import Any
+
+import requests
 
 # Potential issue: Global mutable state
 CACHE = {}
@@ -19,8 +23,8 @@ class UserService:
 
     # Potential issue: SQL injection vulnerability
     def get_user(self, user_id: int) -> dict[str, Any]:
-        query = f"SELECT * FROM users WHERE id = {user_id}"
-        return self.db.execute(query)
+        query = "SELECT * FROM users WHERE id = ?"
+        return self.db.execute(query, (user_id,))
 
     # Potential issue: No input validation
     def create_user(self, user_data: dict) -> dict:
@@ -53,9 +57,7 @@ class UserService:
 
     # Potential issue: Poor error handling
     async def sync_users(self, external_api_url: str):
-        import requests
-
-        response = requests.get(external_api_url)
+        response = requests.get(external_api_url, timeout=5)
         users = response.json()
 
         for user in users:
@@ -63,18 +65,21 @@ class UserService:
 
     # Potential issue: Resource leak
     def export_users(self, filename: str):
-        file = open(filename, "w")
-        users = self.db.execute("SELECT * FROM users")
-        for user in users:
-            file.write(str(user))
-        # File not closed!
+        with Path(filename).open("w") as file:
+            users = self.db.execute("SELECT * FROM users")
+            for user in users:
+                file.write(str(user))
 
     # Potential issue: Hardcoded credentials
     def connect_to_service(self):
-        API_KEY = "sk-test-example-key"  # Example key for testing
-        SECRET = "example-secret-key"  # Example secret for testing
+        api_key = "sk-test-example-key"  # Example key for testing
+        secret = "example-secret-key"  # Example secret for testing
 
-        return self._authenticate(API_KEY, SECRET)
+        return self._authenticate(api_key, secret)
+
+    def _authenticate(self, api_key: str, secret: str):
+        # Placeholder for authentication logic
+        return True
 
     # Potential issue: Infinite recursion risk
     def process_user_tree(self, user, depth=0):
@@ -111,21 +116,18 @@ def process_data(data: list[Any]) -> dict[str, Any]:
     # No type checking
     result = {}
 
-    # Potential division by zero
-    average = sum(data) / len(data)
-
     # Using eval - security risk
     for item in data:
         if isinstance(item, str):
-            value = eval(item)
+            value = ast.literal_eval(item)
             result[item] = value
 
     # Catching too broad exception
     try:
         # Some risky operation
-        risky_operation()
-    except:
-        pass  # Silently ignoring all errors
+        pass  # Placeholder for risky_operation()
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
 
     return result
 
@@ -136,9 +138,7 @@ async def fetch_all_data(urls: list[str]):
     results = []
     for url in urls:
         # Should use aiohttp instead
-        import requests
-
-        response = requests.get(url)  # Blocking call in async function
+        response = requests.get(url, timeout=5)  # Blocking call in async function
         results.append(response.json())
     return results
 
@@ -150,5 +150,5 @@ class Config:
     DATABASE_URL = "postgresql://user:password@localhost/db"  # Credentials in code
 
     # Using mutable default argument
-    def __init__(self, settings={}):
-        self.settings = settings
+    def __init__(self, settings=None):
+        self.settings = settings if settings is not None else {}

@@ -158,6 +158,8 @@ reportUnusedClass = "warning"
 reportUnusedFunction = "warning"
 reportUnusedVariable = "warning"
 reportDuplicateImport = "warning"
+venvPath = ".venv"
+venv = "."
 
 # 🧪 Pytest configuration
 [tool.pytest.ini_options]

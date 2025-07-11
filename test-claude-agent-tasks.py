@@ -87,8 +87,8 @@ def get_user_data(user_id):
     cursor = conn.cursor()
 
     # Dangerous SQL query
-    query = f"SELECT * FROM users WHERE id = {user_id}"
-    cursor.execute(query)
+    query = "SELECT * FROM users WHERE id = ?"
+    cursor.execute(query, (user_id,))
 
     result = cursor.fetchone()
     conn.close()
@@ -138,8 +138,7 @@ async def fetch_data_from_api(url):
 
     async with aiohttp.ClientSession() as session:
         response = await session.get(url)
-        data = await response.json()
-        return data
+        return await response.json()
 
 
 # Task 10: Code explanation
