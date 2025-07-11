@@ -1,0 +1,32 @@
+name: Claude Simple Test
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-test:
+    if: contains(github.event.comment.body, '@claude-test')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test Claude Simple
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          direct_prompt: |
+            Hello! This is a test of the Claude agent. Please respond with a simple greeting and confirm that you can see this repository.
+
+            Also, please check if you can:
+            1. Read files in this repository
+            2. List the contents of the project
+            3. Understand the project structure
+
+            Keep your response brief and to the point.

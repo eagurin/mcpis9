@@ -64,7 +64,7 @@ jobs:
             Always run quality checks in this order: setup -> install -> lint -> types -> test -> security.
             If any step fails, analyze the issue and suggest fixes.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          model: "claude-3-7-sonnet-20250219-beta"
+          model: "claude-3-5-sonnet-20241022"
           fallback_model: "claude-3-5-sonnet-20241022"
           max_turns: "10"
           timeout_minutes: "20"

@@ -34,8 +34,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
           # Model configuration - Claude 3.7 Sonnet with fallback
-          model: "claude-3-7-sonnet-20250219-beta"
-          fallback_model: "claude-3-5-sonnet-20241022"
+          model: "claude-3-5-sonnet-20241022"
+          # fallback_model: "claude-3-5-sonnet-20240620"
 
           # Execution limits
           max_turns: "12"
