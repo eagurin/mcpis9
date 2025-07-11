@@ -30,7 +30,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: ${{ steps.gemini.outputs.stdout }}
+          body: ${{ steps.gemini.outputs.result }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Call Claude Agent
