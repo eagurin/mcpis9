@@ -26,11 +26,14 @@ jobs:
           prompt: "${{ github.event.comment.body }}"
 
       - name: Comment on issue
-        if: always()
+        if: steps.gemini.conclusion == 'success'
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: ${{ steps.gemini.outputs.result }}
+          body: |
+            ## 🤖 Gemini Agent Response
+
+            ${{ steps.gemini.outputs.response || steps.gemini.outputs.result || steps.gemini.outputs.stdout || 'Gemini agent completed successfully.' }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Call Claude Agent
