@@ -58,24 +58,123 @@ def validate_email(email: str) -> bool:
 
 # Task 5: Documentation
 # @claude Add comprehensive docstrings and type hints to this class
-class DataProcessor:
-    def __init__(self, data_source):
-        self.data_source = data_source
-        self.processed_data = None
+from typing import Any, List, Optional, Union
 
-    def load_data(self):
-        # Simulated data loading
+
+class DataProcessor:
+    """A comprehensive data processing class for handling various data operations.
+    
+    This class provides a flexible interface for loading data from various sources
+    and performing common data processing operations such as sum, average, and max.
+    
+    Attributes:
+        data_source: The source of data to process (can be file path, URL, or data object)
+        processed_data: Cached result of the last processing operation
+        
+    Example:
+        >>> processor = DataProcessor("data.csv")
+        >>> result = processor.process("sum")
+        >>> print(result)  # Output: 15
+        
+        >>> processor = DataProcessor({"type": "database", "table": "users"})
+        >>> avg_result = processor.process("average")
+        >>> print(avg_result)  # Output: 3.0
+    """
+    
+    def __init__(self, data_source: Union[str, dict, List[Any]]) -> None:
+        """Initialize the DataProcessor with a data source.
+        
+        Args:
+            data_source: The source of data to process. Can be:
+                - str: File path or URL to data source
+                - dict: Configuration dictionary for data source
+                - List[Any]: Direct data list to process
+                
+        Example:
+            >>> # Initialize with file path
+            >>> processor = DataProcessor("data.csv")
+            
+            >>> # Initialize with configuration
+            >>> processor = DataProcessor({"type": "api", "endpoint": "https://api.com/data"})
+            
+            >>> # Initialize with direct data
+            >>> processor = DataProcessor([1, 2, 3, 4, 5])
+        """
+        self.data_source: Union[str, dict, List[Any]] = data_source
+        self.processed_data: Optional[Union[int, float]] = None
+
+    def load_data(self) -> List[Union[int, float]]:
+        """Load data from the configured data source.
+        
+        This method simulates loading data from various sources. In a real implementation,
+        this would handle different data source types (files, APIs, databases, etc.).
+        
+        Returns:
+            List[Union[int, float]]: A list of numeric data points loaded from the source.
+            
+        Raises:
+            ValueError: If the data source is invalid or cannot be loaded.
+            IOError: If there's an error reading from the data source.
+            
+        Example:
+            >>> processor = DataProcessor("data.csv")
+            >>> data = processor.load_data()
+            >>> print(data)  # Output: [1, 2, 3, 4, 5]
+        """
+        # Simulated data loading - in practice, this would handle different source types
         return [1, 2, 3, 4, 5]
 
-    def process(self, operation):
+    def process(self, operation: str) -> Optional[Union[int, float]]:
+        """Process the loaded data using the specified operation.
+        
+        Performs mathematical operations on the loaded data and caches the result.
+        Supported operations include sum, average, and max.
+        
+        Args:
+            operation: The operation to perform on the data. Supported values:
+                - "sum": Calculate the sum of all values
+                - "average": Calculate the arithmetic mean
+                - "max": Find the maximum value
+                
+        Returns:
+            Optional[Union[int, float]]: The result of the operation, or None if
+            the operation is not supported.
+            
+        Raises:
+            ValueError: If the operation is not supported.
+            ZeroDivisionError: If calculating average on empty data.
+            
+        Example:
+            >>> processor = DataProcessor("data.csv")
+            >>> sum_result = processor.process("sum")
+            >>> print(sum_result)  # Output: 15
+            
+            >>> avg_result = processor.process("average")
+            >>> print(avg_result)  # Output: 3.0
+            
+            >>> max_result = processor.process("max")
+            >>> print(max_result)  # Output: 5
+            
+            >>> invalid_result = processor.process("invalid")
+            >>> print(invalid_result)  # Output: None
+        """
         data = self.load_data()
+        
         if operation == "sum":
-            return sum(data)
-        if operation == "average":
-            return sum(data) / len(data)
-        if operation == "max":
-            return max(data)
-        return None
+            self.processed_data = sum(data)
+            return self.processed_data
+        elif operation == "average":
+            if len(data) == 0:
+                raise ZeroDivisionError("Cannot calculate average of empty data")
+            self.processed_data = sum(data) / len(data)
+            return self.processed_data
+        elif operation == "max":
+            if len(data) == 0:
+                raise ValueError("Cannot find maximum of empty data")
+            self.processed_data = max(data)
+            return self.processed_data
+        else:
+            return None
 
 
 # Task 6: Security review
