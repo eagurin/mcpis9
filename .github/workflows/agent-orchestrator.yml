@@ -26,7 +26,7 @@ jobs:
           prompt: "${{ github.event.comment.body }}"
 
       - name: Comment on issue
-        if: (contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')) && steps.gemini.outputs.reply
+        if: (contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')) && steps.gemini.outputs.stdout
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -37,5 +37,4 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # We need to pass the comment body to the action
           direct_prompt: ${{ github.event.comment.body }}
