@@ -1,0 +1,164 @@
+name: AI Agents Orchestrator
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  orchestrator:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    outputs:
+      trigger_claude: ${{ steps.detect.outputs.trigger_claude }}
+      trigger_gemini: ${{ steps.detect.outputs.trigger_gemini }}
+      trigger_both: ${{ steps.detect.outputs.trigger_both }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect triggers
+        id: detect
+        run: |
+          COMMENT_BODY=""
+          ISSUE_BODY=""
+          PR_BODY=""
+
+          if [ "${{ github.event_name }}" == "issue_comment" ]; then
+            COMMENT_BODY="${{ github.event.comment.body }}"
+          elif [ "${{ github.event_name }}" == "pull_request_review_comment" ]; then
+            COMMENT_BODY="${{ github.event.comment.body }}"
+          elif [ "${{ github.event_name }}" == "issues" ]; then
+            ISSUE_BODY="${{ github.event.issue.body }}"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            PR_BODY="${{ github.event.pull_request.body }}"
+          fi
+
+          FULL_TEXT="$COMMENT_BODY $ISSUE_BODY $PR_BODY"
+
+          echo "trigger_claude=false" >> $GITHUB_OUTPUT
+          echo "trigger_gemini=false" >> $GITHUB_OUTPUT
+          echo "trigger_both=false" >> $GITHUB_OUTPUT
+
+          if echo "$FULL_TEXT" | grep -q "@agents"; then
+            echo "trigger_both=true" >> $GITHUB_OUTPUT
+          elif echo "$FULL_TEXT" | grep -q "@claude"; then
+            echo "trigger_claude=true" >> $GITHUB_OUTPUT
+          elif echo "$FULL_TEXT" | grep -q "@gemini"; then
+            echo "trigger_gemini=true" >> $GITHUB_OUTPUT
+          fi
+
+  claude-agent:
+    needs: orchestrator
+    if: needs.orchestrator.outputs.trigger_claude == 'true' || needs.orchestrator.outputs.trigger_both == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Agent
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          custom_instructions: |
+            Вы специализированный Claude агент для работы с кодом.
+            Фокусируйтесь на:
+            - Код-ревью и анализ качества кода
+            - Рефакторинг и оптимизация
+            - Исправление багов и улучшение архитектуры
+            - Соблюдение стандартов кодирования проекта
+
+            Работайте в связке с Gemini агентом когда активирован @agents.
+          allowed_tools: "Bash(make *),Bash(uv *),Bash(pytest *),Bash(ruff *),Bash(pyright *)"
+
+  gemini-agent:
+    needs: orchestrator
+    if: needs.orchestrator.outputs.trigger_gemini == 'true' || needs.orchestrator.outputs.trigger_both == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Gemini CLI
+        run: |
+          pip install google-generativeai
+          npm install -g @google-ai/generativelanguage
+
+      - name: Run Gemini Agent
+        uses: google-gemini/gemini-cli-action@main
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          project_context: |
+            Вы специализированный Gemini агент для автоматизации задач.
+            Фокусируйтесь на:
+            - Обработка и категоризация тикетов
+            - Автоматизация рутинных задач
+            - Управление проектом и планирование
+            - Тестирование и валидация
+
+            Работайте в связке с Claude агентом когда активирован @agents.
+          allowed_commands: |
+            gh issue *
+            gh pr *
+            pytest
+            make test
+            make lint
+
+  coordination:
+    needs: [orchestrator, claude-agent, gemini-agent]
+    if: always() && needs.orchestrator.outputs.trigger_both == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Coordinate results
+        run: |
+          echo "🤖 Координация результатов работы агентов"
+          echo "Claude Agent Status: ${{ needs.claude-agent.result }}"
+          echo "Gemini Agent Status: ${{ needs.gemini-agent.result }}"
+
+          if [ "${{ needs.claude-agent.result }}" == "success" ] && [ "${{ needs.gemini-agent.result }}" == "success" ]; then
+            echo "✅ Оба агента успешно завершили работу"
+          else
+            echo "⚠️ Один или оба агента завершились с ошибкой"
+          fi
