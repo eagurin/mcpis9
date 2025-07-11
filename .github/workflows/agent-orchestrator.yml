@@ -26,7 +26,7 @@ jobs:
           prompt: "${{ github.event.comment.body }}"
 
       - name: Comment on issue
-        if: (contains(github.event.comment.body, 'gemini') || !contains(github.event.comment.body, 'claude')) && steps.gemini.outputs.stdout
+        if: always()
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
