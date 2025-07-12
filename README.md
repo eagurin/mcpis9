@@ -1,8 +1,29 @@
 ![Claude Code Action responding to a comment](https://github.com/user-attachments/assets/1d60c2e9-82ed-4ee5-b749-f9e021c85f4d)
 
-# Claude Code Action
+# Claude Code Action with Virtual IT Company Agent System
 
-A general-purpose [Claude Code](https://claude.ai/code) action for GitHub PRs and issues that can answer questions and implement code changes. This action listens for a trigger phrase in comments and activates Claude act on the request. It supports multiple authentication methods including Anthropic direct API, Amazon Bedrock, and Google Vertex AI.
+A comprehensive [Claude Code](https://claude.ai/code) action featuring an innovative **Virtual IT Company AI Agent System**. This action provides specialized AI agents that simulate a real IT company structure, each with distinct roles, expertise levels, and collaboration patterns. It supports multiple authentication methods including Anthropic direct API, Amazon Bedrock, and Google Vertex AI.
+
+## 🏢 Virtual IT Company Agent System
+
+This action features a sophisticated multi-agent architecture that simulates a real IT company with specialized roles:
+
+### Available Agents
+
+- **👨‍💼 Project Manager Agent** (`@pm`, `@project-manager`) - Strategic planning, resource allocation, milestone tracking
+- **👨‍💻 Senior Developer Agent** (`@senior-dev`, `@architect`) - Complex features, architecture decisions, mentoring
+- **👩‍💻 Junior Developer Agent** (`@junior-dev`, `@dev`) - Bug fixes, simple features, learning-focused tasks
+- **🔍 Code Reviewer Agent** (`@reviewer`, `@code-review`) - PR analysis, security checks, quality standards
+- **🧪 QA Engineer Agent** (`@qa`, `@tester`) - Testing strategies, bug validation, quality metrics
+- **⚙️ DevOps Engineer Agent** (`@devops`, `@deploy`) - Infrastructure, deployment, CI/CD pipelines
+
+### Smart Agent Features
+
+- **Context-Aware Routing**: Automatically selects the most appropriate agent based on issue/PR content
+- **Complexity Analysis**: Routes tasks to agents with appropriate skill levels
+- **Escalation Paths**: Junior agents can escalate complex tasks to senior agents
+- **Multi-Agent Workflows**: Complex projects can involve multiple agents working together
+- **Professional Communication**: Each agent maintains their role-specific personality and expertise level
 
 ## Features
 
@@ -34,6 +55,61 @@ This command will guide you through setting up the GitHub app and required secre
    - Either `ANTHROPIC_API_KEY` for API key authentication
    - Or `CLAUDE_CODE_OAUTH_TOKEN` for OAuth token authentication (Pro and Max users can generate this by running `claude setup-token` locally)
 3. Copy the workflow file from [`examples/claude.yml`](./examples/claude.yml) into your repository's `.github/workflows/`
+
+## 🚀 Using the Agent System
+
+The Virtual IT Company Agent System automatically routes your requests to the most appropriate agent, but you can also explicitly mention specific agents:
+
+### Automatic Agent Routing
+
+The system intelligently analyzes your issue or PR content and automatically selects the best agent:
+
+```
+# This gets routed to DevOps Agent
+@claude Set up a deployment pipeline for our application
+
+# This gets routed to Senior Developer Agent  
+@claude Design the architecture for a new microservice
+
+# This gets routed to QA Agent
+@claude Create a comprehensive test plan for this feature
+```
+
+### Explicit Agent Mention
+
+Directly mention specific agents for targeted expertise:
+
+```
+# Request project planning
+@pm Can you create a project timeline and resource plan?
+
+# Get senior developer input
+@senior-dev Please review this architecture design
+
+# Ask for code review
+@reviewer Perform a security analysis of this PR
+
+# Get QA perspective  
+@qa What testing strategy should we use?
+
+# DevOps consultation
+@devops How should we structure our CI/CD pipeline?
+
+# Junior developer tasks
+@junior-dev Can you fix this documentation typo?
+```
+
+### Multi-Agent Workflows
+
+For complex tasks, mention multiple agents or use collaborative keywords:
+
+```
+@claude Please review this feature implementation with the full team
+# Automatically involves: Senior Dev, Code Reviewer, QA, and DevOps
+
+@pm @senior-dev @devops Plan and implement the deployment strategy
+# Creates a coordinated workflow between all three agents
+```
 
 ## 📚 FAQ
 

@@ -18,6 +18,7 @@ import { createPrompt } from "../create-prompt";
 import { createOctokit } from "../github/api/client";
 import { fetchGitHubData } from "../github/data/fetcher";
 import { parseGitHubContext } from "../github/context";
+import { AgentIntegration } from "../agents/agent-integration";
 
 async function run() {
   try {
@@ -76,14 +77,28 @@ async function run() {
       }
     }
 
-    // Step 10: Create prompt file
-    await createPrompt(
-      commentId,
-      branchInfo.baseBranch,
-      branchInfo.claudeBranch,
-      githubData,
-      context,
-    );
+    // Step 10: Create prompt file with agent system integration
+    const useAgentSystem = AgentIntegration.shouldUseAgentSystem(context, githubData);
+    
+    if (useAgentSystem) {
+      console.log("Using Virtual IT Company Agent System");
+      await AgentIntegration.processEvent(
+        context,
+        githubData,
+        commentId,
+        branchInfo.baseBranch,
+        branchInfo.claudeBranch
+      );
+    } else {
+      console.log("Using standard Claude Code system");
+      await createPrompt(
+        commentId,
+        branchInfo.baseBranch,
+        branchInfo.claudeBranch,
+        githubData,
+        context,
+      );
+    }
 
     // Step 11: Get MCP configuration
     const additionalMcpConfig = process.env.MCP_CONFIG || "";
