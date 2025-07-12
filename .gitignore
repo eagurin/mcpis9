@@ -1,53 +1,43 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
+# Node.js / TypeScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+*.tgz
+.yarn-integrity
+
+# Build outputs
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+build/
+*.js.map
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Environments
+# Environment files
 .env
-.venv
-env/
-.env/
-venv/
-.venv/
-ENV/
-env.bak/
-venv.bak/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Editors
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Coverage reports
+coverage/
+.nyc_output
+*.lcov
+
+# Cache directories
+.cache/
+.eslintcache
+.parcel-cache/
+
+# Editors and IDEs
 .idea/
 .vscode/
 *.swp
@@ -55,53 +45,35 @@ venv.bak/
 *~
 .DS_Store
 
-# FastAPI
-instance/
-.webassets-cache
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# SQLAlchemy
-*.db
-*.sqlite
-*.sqlite3
+# Temporary files
+*.tmp
+*.temp
+.tmp/
 
-# Alembic
-alembic/versions/*.py.mako
+# GitHub Action specific
+/tmp/
+/downloads/
 
-# Logs
-logs/
-*.log
+# Test output
+test-results/
+coverage/
+
+# Credentials and secrets
+credentials.json
+*.pem
+*.key
+!*.example.*
 
 # CI/CD
-.pip-cache/
-.gitlab-ci-local/
+.github/workflows/.env
 
-# Docker
-.docker/
-docker-compose.override.yml
-
-# Credentials
-.env.local
-.env.*.local
-credentials.json
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# ruff
-.ruff_cache/
-
+# Development
 .cursorignore
 .cursorrules
 .cursor/
 *.codee-workspace/
-csv_processor/
-
-docs/
-
-# uv lock file должен быть в репозитории для воспроизводимых сборок
-# (переопределяем глобальный .gitignore)
-!uv.lock
-agent_codebases/
-node_modules/

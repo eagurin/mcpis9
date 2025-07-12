@@ -11,7 +11,6 @@ I'll help you with this task. Let me start by examining the file to understand w
 ### 🔧 `Read`
 
 **Parameters:**
-
 ```json
 {
   "file_path": "/path/to/sample/file.py"
@@ -19,7 +18,6 @@ I'll help you with this task. Let me start by examining the file to understand w
 ```
 
 **Result:**
-
 ```python
 def example_function():
     print("Debug message")  # This should be removed
@@ -30,7 +28,7 @@ if __name__ == "__main__":
     print(result)
 ```
 
-_Token usage: 100 input, 75 output_
+*Token usage: 100 input, 75 output*
 
 ---
 
@@ -39,7 +37,6 @@ I can see the debug print statement that needs to be removed. Let me fix this by
 ### 🔧 `Edit`
 
 **Parameters:**
-
 ```json
 {
   "file_path": "/path/to/sample/file.py",
@@ -50,7 +47,7 @@ I can see the debug print statement that needs to be removed. Let me fix this by
 
 **→** File successfully edited. The debug print statement has been removed.
 
-_Token usage: 200 input, 50 output_
+*Token usage: 200 input, 50 output*
 
 ---
 
@@ -59,7 +56,6 @@ Perfect! I've successfully removed the debug print statement from the function. 
 ### 🔧 `mcp__github__add_pull_request_review_comment`
 
 **Parameters:**
-
 ```json
 {
   "owner": "example-org",
@@ -74,7 +70,7 @@ Perfect! I've successfully removed the debug print statement from the function. 
 
 **→** Successfully posted review comment to PR #123
 
-_Token usage: 150 input, 80 output_
+*Token usage: 150 input, 80 output*
 
 ---
 
@@ -86,7 +82,7 @@ Great! I've successfully completed the requested task:
 
 The debug print statement has been removed as requested by the reviewers.
 
-_Token usage: 180 input, 60 output_
+*Token usage: 180 input, 60 output*
 
 ---
 
