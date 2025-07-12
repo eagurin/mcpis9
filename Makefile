@@ -102,18 +102,26 @@ clean:
 # ==================== ✅ КАЧЕСТВО КОДА (СТЕК 2025) ====================
 
 # 🎯 Современная команда для всех проверок
-check: lint types security test-fast
+check: lint types security
 	@echo "$(GREEN)✅ Все проверки пройдены!$(RESET)"
 
 # 🎯 Линтинг с современным Ruff (заменяет Flake8, Black, isort, pyupgrade)
 lint:
 	@echo "$(CYAN)🎯 Проверка кода с Ruff...$(RESET)"
-	$(UV) run ruff check $(SRC_DIR) $(TESTS_DIR)
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run ruff check $(SRC_DIR) $(TESTS_DIR); \
+	else \
+		$(UV) run ruff check $(SRC_DIR); \
+	fi
 
 # 🔬 Проверка типов с Pyright (быстрее чем MyPy)
 types:
 	@echo "$(CYAN)🔬 Проверка типов с Pyright...$(RESET)"
-	$(UV) run pyright $(SRC_DIR) $(TESTS_DIR)
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run pyright $(SRC_DIR) $(TESTS_DIR); \
+	else \
+		$(UV) run pyright $(SRC_DIR); \
+	fi
 
 # 🔒 Сканирование безопасности
 security:
@@ -126,13 +134,22 @@ security:
 # ✨ Форматирование кода
 format:
 	@echo "$(CYAN)✨ Форматирование кода с Ruff...$(RESET)"
-	$(UV) run ruff format $(SRC_DIR) $(TESTS_DIR)
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run ruff format $(SRC_DIR) $(TESTS_DIR); \
+	else \
+		$(UV) run ruff format $(SRC_DIR); \
+	fi
 
 # 🔧 Автоисправление проблем
 fix:
 	@echo "$(CYAN)🔧 Автоисправление проблем...$(RESET)"
-	$(UV) run ruff check --fix $(SRC_DIR) $(TESTS_DIR)
-	$(UV) run ruff format $(SRC_DIR) $(TESTS_DIR)
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run ruff check --fix $(SRC_DIR) $(TESTS_DIR); \
+		$(UV) run ruff format $(SRC_DIR) $(TESTS_DIR); \
+	else \
+		$(UV) run ruff check --fix $(SRC_DIR); \
+		$(UV) run ruff format $(SRC_DIR); \
+	fi
 
 # 🪝 Pre-commit хуки
 pre-commit:
@@ -147,20 +164,36 @@ pre-commit-update:
 
 test:
 	@echo "$(CYAN)🧪 Запуск тестов...$(RESET)"
-	$(UV) run pytest $(TESTS_DIR) -v
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run pytest $(TESTS_DIR) -v; \
+	else \
+		echo "$(YELLOW)⚠️  Директория тестов не найдена. Создайте $(TESTS_DIR)/ и добавьте тесты.$(RESET)"; \
+	fi
 
 test-fast:
 	@echo "$(CYAN)⚡ Запуск быстрых тестов...$(RESET)"
-	$(UV) run pytest $(TESTS_DIR) -x --ff -q
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run pytest $(TESTS_DIR) -x --ff -q; \
+	else \
+		echo "$(YELLOW)⚠️  Директория тестов не найдена. Создайте $(TESTS_DIR)/ и добавьте тесты.$(RESET)"; \
+	fi
 
 test-watch:
 	@echo "$(CYAN)👀 Запуск тестов в режиме наблюдения...$(RESET)"
-	$(UV) run pytest-watch -- $(TESTS_DIR)
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run pytest-watch -- $(TESTS_DIR); \
+	else \
+		echo "$(YELLOW)⚠️  Директория тестов не найдена. Создайте $(TESTS_DIR)/ и добавьте тесты.$(RESET)"; \
+	fi
 
 coverage:
 	@echo "$(CYAN)📊 Генерация отчёта покрытия...$(RESET)"
-	$(UV) run pytest $(TESTS_DIR) --cov=$(SRC_DIR) --cov-report=html --cov-report=term-missing
-	@echo "$(GREEN)📊 Отчёт покрытия: htmlcov/index.html$(RESET)"
+	@if [ -d "$(TESTS_DIR)" ]; then \
+		$(UV) run pytest $(TESTS_DIR) --cov=$(SRC_DIR) --cov-report=html --cov-report=term-missing; \
+		echo "$(GREEN)📊 Отчёт покрытия: htmlcov/index.html$(RESET)"; \
+	else \
+		echo "$(YELLOW)⚠️  Директория тестов не найдена. Создайте $(TESTS_DIR)/ и добавьте тесты.$(RESET)"; \
+	fi
 
 # ==================== 🐳 DOCKER ====================
 

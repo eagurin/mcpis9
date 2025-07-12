@@ -103,3 +103,4 @@ docs/
 # uv lock file должен быть в репозитории для воспроизводимых сборок
 # (переопределяем глобальный .gitignore)
 !uv.lock
+agent_codebases/

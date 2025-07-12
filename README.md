@@ -1,389 +1,283 @@
-# 🎪 MCPIS9 - Современный MCP Сервер с Оркестрацией ИИ Агентов
+# MCPIS9
 
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![UV](https://img.shields.io/badge/dependency%20manager-UV-purple.svg)](https://github.com/astral-sh/uv)
-[![Ruff](https://img.shields.io/badge/linter-Ruff-red.svg)](https://github.com/astral-sh/ruff)
-[![FastAPI](https://img.shields.io/badge/framework-FastAPI-green.svg)](https://fastapi.tiangolo.com/)
+MCP (Model Context Protocol) implementation with GitHub Agent Orchestrator for AI-powered automation workflows.
 
-> **Современный Python-based MCP (Model Context Protocol) сервер с возможностями оркестрации GitHub агентов, построенный с использованием лучших практик 2025 года.**
+## Overview
 
-MCPIS9 предоставляет высокопроизводительный асинхронный MCP сервер, который интегрируется с несколькими ИИ провайдерами (Claude, Gemini) и предлагает комплексную автоматизацию GitHub через интеллектуальную оркестрацию агентов.
+MCPIS9 is a Python-based MCP server that integrates with GitHub and AI services to provide intelligent automation capabilities. Built with modern Python 3.12+ and FastAPI, it offers:
 
-## ✨ Возможности
+- **MCP Protocol 1.10.1+** implementation for AI agent communication
+- **GitHub Agent Orchestration** for automated repository operations
+- **Multi-AI Support** with Claude (Anthropic) and Gemini integrations
+- **Async-first Architecture** with FastAPI and Redis caching
+- **Enterprise-ready** with comprehensive testing and security scanning
 
-- 🚀 **Современный MCP Протокол 1.10.1+** - Последняя имплементация Model Context Protocol
-- 🤖 **Мульти-ИИ Интеграция** - Поддержка Claude, Gemini и расширяемых ИИ провайдеров
-- 🐙 **GitHub Оркестрация** - Продвинутая автоматизация репозиториев и координация агентов
-- ⚡ **Высокая Производительность** - FastAPI + async/await + Redis кэширование
-- 🔒 **Безопасность Прежде Всего** - GitLeaks, Bandit и комплексное сканирование безопасности
-- 🧪 **Обеспечение Качества** - 80% покрытие тестами с современными инструментами
-- 🐳 **Готов к Продакшн** - Docker контейнеризация и развертывание
-- 📊 **Наблюдаемость** - Структурированное логирование и мониторинг
+## Virtual IT Company Architecture
 
-## 🛠️ Современный Технологический Стек (2025)
+This project implements a virtual IT company with specialized AI agents:
 
-### Основные Технологии
+- **Project Manager** - Issue triage and workflow coordination
+- **Tech Lead** - Technical analysis and architecture decisions
+- **Developer** - Code implementation using Gemini AI
+- **QA Engineer** - Testing and quality assurance
+- **DevOps** - Deployment and monitoring
 
-- **Python 3.12+** - Последние возможности и производительность Python
-- **FastAPI** - Современный асинхронный веб-фреймворк с автоматической OpenAPI документацией
-- **UV** - Ультрабыстрый менеджер пакетов Python (в 2-10 раз быстрее pip)
-- **Pydantic V2** - Типобезопасная валидация данных и настроек
+## Quick Start
 
-### Инструменты Разработки
+### Prerequisites
 
-- **Ruff** - Молниеносный линтер/форматтер (в 10-100 раз быстрее Black+Flake8)
-- **Pyright** - Проверщик типов от Microsoft (в 5-10 раз быстрее MyPy)
-- **Pytest** - Современное тестирование с поддержкой async
-- **Pre-commit** - Комплексные автоматизированные проверки качества
+- Python 3.12 or higher
+- Redis server (for caching)
+- GitHub token (for GitHub operations)
+- API keys for AI services (Anthropic, Google Gemini)
 
-### Инфраструктура
+### Installation
 
-- **Redis** - Высокопроизводительное кэширование и управление сессиями
-- **Supabase** - Современный PostgreSQL бэкенд с возможностями реального времени
-- **Docker** - Контейнеризованное развертывание с многоэтапными сборками
-
-## 🚀 Быстрый Старт
-
-### Предварительные Требования
-
-- **Python 3.12+** - [Скачать](https://www.python.org/downloads/)
-- **UV** - Устанавливается автоматически во время настройки
-
-### Установка
+1. Clone the repository:
 
 ```bash
-# 📦 Клонируйте репозиторий
 git clone https://github.com/eagurin/mcpis9.git
 cd mcpis9
-
-# 🚀 Полная настройка (устанавливает UV + зависимости + pre-commit)
-make setup
-
-# 🔧 Настройте окружение
-cp .env.example .env
-# Отредактируйте .env с вашими API ключами и конфигурацией
 ```
 
-### Конфигурация Окружения
-
-Создайте файл `.env` с необходимой конфигурацией:
+2. Set up the development environment:
 
 ```bash
-# ИИ Сервисы
-GEMINI_API_KEY=ваш_gemini_ключ
-ANTHROPIC_API_KEY=ваш_claude_ключ
+make setup    # Install UV package manager
+make install  # Install all dependencies
+```
 
-# GitHub Интеграция
-GITHUB_TOKEN=ваш_github_токен
+3. Configure environment variables:
 
-# База Данных и Кэш
-SUPABASE_URL=ваш_supabase_url
-SUPABASE_ANON_KEY=ваш_supabase_ключ
+```bash
+cp .env.example .env
+# Edit .env with your API keys and configuration
+```
+
+4. Run the development server:
+
+```bash
+make run
+# or
+uvicorn app.main:app --reload --port 8000
+```
+
+## Available Commands
+
+### Development Environment
+
+```bash
+make setup          # Install UV and set up environment
+make install        # Install all dependencies
+make dev           # Install with development dependencies
+```
+
+### Code Quality
+
+```bash
+make lint          # Run ruff linting
+make fix           # Auto-fix linting issues
+make types         # Run pyright type checking
+make security      # Run bandit security scanning
+make check         # Run all quality checks
+```
+
+### Testing
+
+```bash
+make test          # Run all tests
+make test-fast     # Run tests without coverage
+make test-watch    # Run tests in watch mode
+make coverage      # Generate coverage reports
+```
+
+### Other Commands
+
+```bash
+make format        # Code formatting
+make clean         # Clean cache and temporary files
+```
+
+## CLI Applications
+
+MCPIS9 provides three CLI entry points:
+
+- **`mcpis9-server`** - Main MCP server application
+- **`github-orchestrator`** - GitHub agent orchestration tool
+- **`agent-cli`** - General-purpose CLI interface
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+# GitHub Integration
+GITHUB_TOKEN=your_github_token
+
+# AI Services
+ANTHROPIC_API_KEY=your_anthropic_key
+GEMINI_API_KEY=your_gemini_key
+
+# Redis Configuration
 REDIS_URL=redis://localhost:6379
 
-# Настройки Приложения
-API_HOST=0.0.0.0
-API_PORT=8000
-DEBUG=true
+# Application Settings
+LOG_LEVEL=INFO
+ENV=development
 ```
 
-### Запуск Приложения
+### Settings Management
+
+Configuration is handled through `app/core/config.py` using Pydantic settings:
+
+- Type-safe environment variable loading
+- Validation and default values
+- Centralized configuration management
+
+## Architecture
+
+### Project Structure
+
+```
+mcpis9/
+├── app/                    # Main application code
+│   ├── core/              # Core functionality
+│   │   └── config.py      # Configuration management
+│   ├── main.py            # FastAPI entry point
+│   └── ...
+├── tests/                 # Test suite
+├── agent_codebases/       # Integrated agent codebases
+│   ├── claude-code-action/
+│   ├── claude-code-base-action/
+│   └── gemini-cli-action/
+├── pyproject.toml         # Project configuration
+└── Makefile              # Development commands
+```
+
+### Technology Stack
+
+- **FastAPI** - Async web framework with automatic OpenAPI documentation
+- **Pydantic** - Data validation and settings management
+- **Redis** - Caching and session management
+- **PyGithub** - GitHub API integration
+- **Anthropic SDK** - Claude AI integration
+- **HTTPX** - Modern async HTTP client
+- **Rich** - Enhanced CLI output
+- **MCP** - Model Context Protocol
+
+### AI Agent Integration
+
+- **Claude Code Action** - For analysis and review roles (Tech Lead, QA)
+- **Gemini CLI Action** - For code generation (Developer)
+- **GitHub API** - For repository operations and communication
+- **Event-driven architecture** - GitHub webhooks for seamless handoffs
+
+## Development Workflow
+
+### Pre-commit Hooks
+
+The project uses pre-commit for automated quality checks:
 
 ```bash
-# 🏃 Запуск сервера разработки (с авто-перезагрузкой)
-make run
-
-# 🏭 Запуск продакшн сервера (с воркерами)
-make run-prod
-
-# 🐳 Запуск с Docker
-make docker-build
-make docker-run
+pre-commit install  # Set up hooks
+pre-commit run --all-files  # Run all checks
 ```
 
-## 📋 Доступные Команды
+Hooks include:
 
-### 📦 Установка и Настройка
+- Security scanning (GitLeaks, Bandit)
+- Code formatting (Ruff)
+- Type checking (Pyright)
+- File validation (YAML, JSON, TOML)
+
+### Code Standards
+
+- **Line length**: 100 characters
+- **Python version**: 3.12+ features encouraged
+- **Type annotations**: Required for all functions
+- **Async patterns**: Used throughout the codebase
+- **Test coverage**: Minimum 80% required
+
+### Testing
 
 ```bash
-make setup          # 🚀 Полная настройка проекта
-make install        # 📥 Установка продакшн зависимостей
-make dev           # 🔧 Установка зависимостей разработки
-make clean         # 🧹 Очистка кэша и временных файлов
+# Run unit tests
+pytest tests/unit
+
+# Run integration tests
+pytest tests/integration
+
+# Run with coverage
+pytest --cov=app --cov-report=html
 ```
 
-### ✅ Качество Кода (Лучшие Практики 2025)
-
-```bash
-make check         # 🔍 Запуск всех проверок (lint + types + security + tests)
-make lint          # 🎯 Линтинг с Ruff (заменяет Flake8, Black, isort)
-make types         # 🔬 Проверка типов с Pyright (быстрее чем MyPy)
-make security      # 🔒 Сканирование безопасности (GitLeaks + Bandit)
-make format        # ✨ Форматирование кода с Ruff
-make fix           # 🔧 Авто-исправление всех проблем
-make pre-commit    # 🪝 Запуск pre-commit хуков
-```
-
-### 🧪 Тестирование
-
-```bash
-make test          # 🚀 Запуск полного набора тестов
-make test-fast     # ⚡ Быстрые тесты без покрытия
-make test-watch    # 👀 Непрерывное тестирование
-make coverage      # 📊 Генерация отчетов покрытия (минимум 80%)
-```
+## GitHub Actions Integration
 
-### 🐳 Docker Операции
-
-```bash
-make docker-build  # 🏗️ Сборка оптимизированного контейнера
-make docker-run    # 🚀 Запуск контейнеризованного приложения
-make docker-clean  # 🧹 Очистка Docker артефактов
-```
+The repository includes pre-configured GitHub Actions workflows for:
 
-### 🎯 Рабочие Процессы Разработки
-
-```bash
-make ci           # 🤖 Локальная симуляция CI пайплайна
-make all          # 🎪 Полный рабочий процесс (clean + install + check + test)
-make status       # 📊 Показать статус проекта
-```
+- Code review automation
+- Issue triage
+- PR management
+- CI/CD pipelines
 
-### 📱 Быстрые Сокращения
+See `agent_codebases/` for integrated GitHub Actions:
 
-```bash
-make l            # lint
-make t            # test
-make c            # check
-make f            # fix
-make r            # run
-```
+- `claude-code-action` - Claude-powered code reviews
+- `claude-code-base-action` - Claude base actions
+- `gemini-cli-action` - Gemini integration
 
-## 🏗️ Архитектура
+## Features
 
-### Структура Проекта
+- Complete software development lifecycle automation
+- AI-powered code generation and review
+- Automated testing and quality assurance
+- GitHub integration with proper status tracking
+- Modern Python stack (UV, Ruff, Pyright)
+- Docker support for deployment
 
-```bash
-app/                          # Основное приложение (следует FastAPI паттернам)
-├── core/
-│   ├── config.py            # Управление настройками Pydantic
-│   ├── logging.py           # Структурированное логирование
-│   └── middleware.py        # FastAPI middleware
-├── api/
-│   ├── v1/                  # API версия 1
-│   ├── v1_graphql/         # GraphQL эндпоинты
-│   └── v2/                  # API версия 2 (последняя)
-├── services/                # Слой бизнес-логики
-├── models/                  # Модели данных и схемы
-├── clients/                 # Интеграции внешних сервисов
-│   ├── supabase/           # Supabase клиент
-│   └── graphql/            # GraphQL клиент
-└── main.py                  # Точка входа FastAPI приложения
+## Security
 
-tests/                       # Комплексный набор тестов
-├── unit/                   # Быстрые, изолированные тесты
-├── integration/            # Тесты взаимодействия сервисов
-└── conftest.py             # Конфигурация Pytest
-```
+- All dependencies are pinned to specific versions
+- Regular security scanning with Bandit
+- Pre-commit hooks for security checks
+- Automated dependency updates
 
-### CLI Приложения
+## Contributing
 
-Три специализированных интерфейса командной строки:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-- **`mcpis9-server`** - Основное MCP серверное приложение
-- **`github-orchestrator`** - Система оркестрации GitHub агентов
-- **`agent-cli`** - CLI интерфейс общего назначения
+Please ensure:
 
-## 🔧 Управление Конфигурацией
+- All tests pass (`make test`)
+- Code quality checks pass (`make check`)
+- Coverage remains above 80%
 
-### Типобезопасные Настройки
+## License
 
-Конфигурация управляется через `app/core/config.py` с использованием настроек Pydantic:
+This project is licensed under the GNU General Public License v2.0 - see the [LICENSE](LICENSE) file for details.
 
-- ✅ Автоматическая загрузка переменных окружения
-- ✅ Валидация типов с полезными сообщениями об ошибках
-- ✅ Значения по умолчанию и конфигурации для конкретного окружения
-- ✅ Поддержка окружений разработки, staging и продакшн
+## Project Status
 
-### Документация API
+MCPIS9 is in early-stage development with:
 
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
-- **GraphQL**: Интерфейс GraphiQL для GraphQL эндпоинтов
+- ✅ Well-configured development environment
+- ✅ Core infrastructure and foundations
+- 🚧 MCP protocol implementation (in progress)
+- 🚧 GitHub agent orchestration (in progress)
+- 📋 Additional AI integrations (planned)
 
-## 🛡️ Безопасность и Качество
+## Links
 
-### Подход Безопасность Прежде Всего
-
-- **🔒 GitLeaks** - Предотвращает коммиты секретов (API ключи, пароли, токены)
-- **🛡️ Bandit** - Обнаруживает уязвимости безопасности Python
-- **🔍 Сканирование Зависимостей** - UV предоставляет обнаружение уязвимостей
-- **🪝 Pre-commit** - Автоматизированные проверки безопасности на каждом коммите
-
-### Стандарты Качества Кода
-
-- **📏 Длина Строки**: 100 символов (современный стандарт)
-- **🎯 Покрытие**: Минимум 80% покрытия тестами принудительно
-- **🔬 Аннотации Типов**: Обязательны для всех функций
-- **⚡ Производительность**: Паттерны async/await повсюду
-- **📝 Документация**: Комплексная встроенная и API документация
-
-## 🧪 Стратегия Тестирования
-
-### Организация Тестов
-
-- **Юнит Тесты** - Быстрое, изолированное тестирование компонентов
-- **Интеграционные Тесты** - Валидация взаимодействия сервисов
-- **Поддержка Async** - Встроенная конфигурация pytest-asyncio
-- **Маркеры** - `slow`, `integration`, `unit` для селективного тестирования
-
-### Требования к Покрытию
-
-- **Минимум**: 80% покрытие принудительно в CI
-- **Отчеты**: HTML отчеты в `htmlcov/index.html`
-- **Исключения**: Тесты, миграции и директории кэша
-- **CI Интеграция**: Автоматическая отчетность покрытия
-
-## 🐳 Docker Развертывание
-
-### Многоэтапная Продакшн Сборка
-
-```bash
-# Сборка оптимизированного контейнера
-make docker-build
-
-# Запуск с переменными окружения
-make docker-run
-
-# Разработка с горячей перезагрузкой
-docker run -v $(pwd):/app -p 8000:8000 mcpis9:latest
-```
-
-### Продакшн Возможности
-
-- **🐧 Базовый Образ**: Python 3.12 slim для безопасности и размера
-- **👤 Безопасность**: Выполнение под не-root пользователем
-- **⚡ Производительность**: UV для ультрабыстрой установки зависимостей
-- **📦 Оптимизация**: Многоэтапные сборки с кэшированием слоев
-
-## 🤝 Рабочий Процесс Разработки
-
-### Pre-commit Хуки (Комплексные)
-
-Каждый коммит автоматически запускает:
-
-```yaml
-🔒 Безопасность: GitLeaks обнаружение секретов
-📁 Файловая система: Безопасность файлов и валидация формата
-✅ Конфигурация: Проверка синтаксиса YAML/TOML/JSON
-🐍 Python: Ruff линтинг и форматирование
-🔬 Типы: Pyright проверка типов
-📊 SQL: SQLFluff форматирование (PostgreSQL)
-🔧 Зависимости: UV обновления lock файла
-🌳 Git: Стандарты защиты веток
-✍️ Коммиты: Валидация conventional commit
-🧪 Тесты: Верификация структуры тестов
-```
-
-### Управление Пакетами (UV)
-
-Современное управление зависимостями с UV:
-
-- **🔒 Lock Файл**: `uv.lock` для воспроизводимых сборок
-- **⚡ Скорость**: В 2-10 раз быстрее pip/poetry
-- **🛡️ Безопасность**: Встроенное сканирование уязвимостей
-- **🔄 Совместимость**: Полная поддержка экосистемы pip
-
-### Управление Релизами
-
-Семантическое версионирование с Commitizen:
-
-```bash
-# 🎉 Создание нового релиза с changelog
-make release
-
-# 🔍 Предварительный просмотр изменений релиза
-make release-dry
-```
-
-## 📚 Документация
-
-### Для ИИ Ассистентов
-
-- **[CLAUDE.md](CLAUDE.md)** - Руководство для разработки с Claude AI
-- **[GEMINI.md](GEMINI.md)** - Руководство для интеграции с Google Gemini
-
-### Руководства Разработчика
-
-- **Настройка Pre-commit** - Автоматизировано в `make setup`
-- **Лучшие Практики Makefile** - Современные паттерны разработки 2025
-- **Руководство по Тестированию** - Комплексная стратегия тестирования
-
-## 🚀 Бенчмарки Производительности
-
-### Преимущества Современного Стека
-
-- **UV Менеджер Пакетов**: В 2-10 раз быстрее pip/poetry
-- **Ruff Линтинг**: В 10-100 раз быстрее Black+Flake8+isort
-- **Pyright Проверка Типов**: В 5-10 раз быстрее MyPy
-- **FastAPI Фреймворк**: Высокопроизводительные асинхронные возможности
-- **Redis Кэширование**: Время отклика менее миллисекунды
-
-## 🛣️ Дорожная Карта
-
-### Текущий Статус (Ранняя Разработка)
-
-- ✅ Настроена современная среда разработки
-- ✅ Внедрены инструменты безопасности и качества
-- ✅ Установлен фреймворк тестирования с 80% покрытием
-- ✅ Готова архитектура мульти-ИИ провайдера
-- 🚧 Реализация функций в процессе
-- 🚧 Возможности оркестрации GitHub
-- 🚧 Оптимизации продакшн развертывания
-
-### Предстоящие Возможности
-
-- 📊 **Мониторинг и Наблюдаемость** - Метрики Prometheus и распределенная трассировка
-- 🔄 **Автоматизация Рабочих Процессов** - Продвинутая интеграция GitHub Actions
-- 🤖 **Координация ИИ Агентов** - Оркестрация многоагентных задач
-- 📈 **Масштабируемость** - Развертывание Kubernetes и горизонтальное масштабирование
-- 🔌 **Система Плагинов** - Расширяемая архитектура для пользовательских интеграций
-
-## 🤝 Участие в Проекте
-
-Мы приветствуем вклад! Пожалуйста, ознакомьтесь с нашей настройкой разработки:
-
-1. **Форкните репозиторий**
-2. **Настройте среду разработки**: `make setup`
-3. **Создайте feature ветку**: `git checkout -b feature/amazing-feature`
-4. **Внесите изменения и протестируйте**: `make check`
-5. **Коммитьте в conventional формате**: `feat: add amazing feature`
-6. **Пушьте и создайте Pull Request**
-
-### Стандарты Разработки
-
-- ✅ Весь код должен проходить `make check` (lint + types + security + tests)
-- ✅ Требуется минимум 80% покрытие тестами
-- ✅ Принудительные conventional commit сообщения
-- ✅ Pre-commit хуки должны проходить
-- ✅ Обновления документации для новых возможностей
-
-## 📄 Лицензия
-
-Этот проект лицензирован под GNU General Public License v2.0 - смотрите файл [LICENSE](LICENSE) для деталей.
-
-## 🙏 Благодарности
-
-- **[Anthropic](https://anthropic.com)** - Интеграция Claude AI
-- **[Google](https://ai.google.dev)** - Поддержка Gemini AI
-- **[Astral](https://astral.sh)** - UV и Ruff современные инструменты
-- **[Microsoft](https://github.com/microsoft/pyright)** - Pyright проверщик типов
-- **[FastAPI](https://fastapi.tiangolo.com)** - Современный веб-фреймворк
-- **[Supabase](https://supabase.com)** - Backend as a Service
+- **Homepage**: [https://github.com/eagurin/mcpis9](https://github.com/eagurin/mcpis9)
+- **Issues**: [https://github.com/eagurin/mcpis9/issues](https://github.com/eagurin/mcpis9/issues)
+- **Documentation**: See [CLAUDE.md](CLAUDE.md) for AI assistant instructions
 
 ---
 
-**🎪 Готов к современной Python разработке с ИИ-powered автоматизацией в 2025!**
-
-[Начало Работы](#-быстрый-старт) • [Документация](#-документация) • [Участие](#-участие-в-проекте) • [Лицензия](#-лицензия)
+**Powered by AI Agents** - The Future of Software Development
