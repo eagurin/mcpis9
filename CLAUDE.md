@@ -1,155 +1,58 @@
 # CLAUDE.md
 
-Этот файл предоставляет руководство для Claude Code (claude.ai/code) при работе с кодом в этом репозитории.
+This file provides guidance to Claude Code when working with code in this repository.
 
-## Обзор Проекта
+## Development Tools
 
-MCPIS9 - это Python-based MCP (Model Context Protocol) сервер с возможностями оркестрации GitHub агентов. Проект использует современный Python 3.12+ с FastAPI, интегрируется с Anthropic Claude API и предоставляет автоматизацию GitHub через PyGithub.
+- Runtime: Bun 1.2.11
 
-## Команды Разработки
+## Common Development Tasks
 
-### Настройка Окружения
-
-```bash
-make setup          # Установка UV и настройка окружения
-make install        # Установка всех зависимостей
-make dev           # Установка с зависимостями разработки
-```
-
-### Качество Кода
+### Available npm/bun scripts from package.json:
 
 ```bash
-make lint          # Запуск ruff линтинга
-make fix           # Авто-исправление проблем линтинга
-make types         # Запуск pyright проверки типов
-make security      # Запуск bandit сканирования безопасности
-make check         # Запуск всех проверок качества
+# Test
+bun test
+
+# Formatting
+bun run format          # Format code with prettier
+bun run format:check    # Check code formatting
 ```
 
-### Тестирование
+## Architecture Overview
 
-```bash
-make test          # Запуск всех тестов
-make test-fast     # Запуск тестов без покрытия
-make test-watch    # Запуск тестов в режиме наблюдения
-make coverage      # Генерация отчетов покрытия
+This is a GitHub Action that enables Claude to interact with GitHub PRs and issues. The action:
+
+1. **Trigger Detection**: Uses `check-trigger.ts` to determine if Claude should respond based on comment/issue content
+2. **Context Gathering**: Fetches GitHub data (PRs, issues, comments) via `github-data-fetcher.ts` and formats it using `github-data-formatter.ts`
+3. **AI Integration**: Supports multiple Claude providers (Anthropic API, AWS Bedrock, Google Vertex AI)
+4. **Prompt Creation**: Generates context-rich prompts using `create-prompt.ts`
+5. **MCP Server Integration**: Installs and configures GitHub MCP server for extended functionality
+
+### Key Components
+
+- **Trigger System**: Responds to `/claude` comments or issue assignments
+- **Authentication**: OIDC-based token exchange for secure GitHub interactions
+- **Cloud Integration**: Supports direct Anthropic API, AWS Bedrock, and Google Vertex AI
+- **GitHub Operations**: Creates branches, posts comments, and manages PRs/issues
+
+### Project Structure
+
+```
+src/
+├── check-trigger.ts        # Determines if Claude should respond
+├── create-prompt.ts        # Generates contextual prompts
+├── github-data-fetcher.ts  # Retrieves GitHub data
+├── github-data-formatter.ts # Formats GitHub data for prompts
+├── install-mcp-server.ts  # Sets up GitHub MCP server
+├── update-comment-with-link.ts # Updates comments with job links
+└── types/
+    └── github.ts          # TypeScript types for GitHub data
 ```
 
-### Сервер Разработки
+## Important Notes
 
-```bash
-make run           # Запуск сервера разработки
-uvicorn app.main:app --reload --port 8000
-```
-
-## Архитектура
-
-### Основная Структура
-
-- **`app/`** - Основной код приложения, следующий FastAPI паттернам
-- **`app/core/config.py`** - Централизованная конфигурация с использованием Pydantic настроек
-- **`app/main.py`** - Точка входа FastAPI приложения
-- **`tests/`** - Набор тестов с pytest и поддержкой async
-
-### Ключевые Технологии
-
-- **MCP Protocol 1.10.1+** - Реализация Model Context Protocol
-- **FastAPI** - Асинхронный веб-фреймворк с автоматической OpenAPI документацией
-- **Pydantic** - Валидация данных и управление настройками
-- **Redis** - Кэширование и управление сессиями
-- **PyGithub** - Интеграция с GitHub API
-- **Anthropic SDK** - Интеграция с Claude AI
-
-### CLI Приложения
-
-Три точки входа CLI определены в `pyproject.toml`:
-
-- `mcpis9-server` - Основное MCP серверное приложение
-- `github-orchestrator` - Оркестрация GitHub агентов
-- `agent-cli` - Общий CLI интерфейс
-
-## Конфигурация
-
-### Переменные Окружения
-
-Настройка в `.env`:
-
-- `GITHUB_TOKEN` - Доступ к GitHub API
-- `ANTHROPIC_API_KEY` - Ключ Claude API
-- `REDIS_URL` - Строка подключения Redis
-- `GEMINI_API_KEY` - Ключ Google Gemini API
-
-### Управление Настройками
-
-Конфигурация обрабатывается через `app/core/config.py` с использованием Pydantic настроек:
-
-- Типобезопасная загрузка переменных окружения
-- Валидация и значения по умолчанию
-- Конфигурация GitHub и ИИ сервисов
-
-## Стандарты Качества Кода
-
-### Стек Инструментов
-
-- **Ruff** - Универсальный линтер, форматтер и организатор импортов
-- **Pyright** - Проверка типов в строгом режиме
-- **Pytest** - Тестирование с требованием 80% покрытия
-- **Pre-commit** - Автоматизированные проверки качества
-
-### Стиль Кода
-
-- Длина строки: 100 символов
-- Поощряются возможности Python 3.12+
-- Аннотации типов обязательны для всех функций
-- Паттерны async/await повсюду
-
-## Руководство по Тестированию
-
-### Структура Тестов
-
-- **Юнит тесты** - Быстрое, изолированное тестирование компонентов
-- **Интеграционные тесты** - Тестирование взаимодействия сервисов
-- **Поддержка Async** - Встроенная конфигурация pytest-asyncio
-
-### Требования к Покрытию
-
-- Минимум 80% покрытие принудительно
-- HTML отчеты генерируются в `htmlcov/`
-- Исключение тестовых файлов и миграций из покрытия
-
-## Рабочий Процесс Разработки
-
-### Pre-commit Хуки
-
-Комплексные проверки запускаются автоматически:
-
-- Сканирование безопасности (GitLeaks, Bandit)
-- Форматирование кода (Ruff)
-- Проверка типов (Pyright)
-- Валидация файлов (YAML, JSON, TOML)
-- Управление зависимостями (UV)
-
-### Управление Пакетами
-
-- **UV** - Современный менеджер пакетов Python
-- **uv.lock** - Воспроизводимое разрешение зависимостей
-- **Hatchling** - Бэкенд сборки для упаковки
-
-## Важные Замечания
-
-### Состояние Проекта
-
-Это проект ранней стадии с:
-
-- Хорошо настроенной средой разработки
-- Минимальной реализацией (только основа)
-- Готовностью к разработке функций
-- Сильным фокусом на качестве кода и безопасности
-
-### Зависимости
-
-Все зависимости закреплены на конкретных версиях для воспроизводимости. Проект использует современные пакеты с оптимизацией производительности (например, `redis[hiredis]`, `uvicorn[standard]`).
-
-### GitHub Интеграция
-
-Проект разработан для оркестрации GitHub агентов, но реализация находится в ожидании. Основа поддерживает обработку webhook и автоматизированные операции с репозиториями.
+- Actions are triggered by `@claude` comments or issue assignment unless a different trigger_phrase is specified
+- The action creates branches for issues and pushes to PR branches directly
+- All actions create OIDC tokens for secure authentication
+- Progress is tracked through dynamic comment updates with checkboxes

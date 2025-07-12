@@ -104,3 +104,4 @@ docs/
 # (переопределяем глобальный .gitignore)
 !uv.lock
 agent_codebases/
+node_modules/
