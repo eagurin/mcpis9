@@ -7,16 +7,16 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run --filter='*' dev",
+    "dev": "bun run --filter='@mcpis9/web' dev --host 127.0.0.1 --port 3000",
     "build": "bun run --filter='*' build",
     "start": "bun run --filter='*' start",
     "test": "bun run --filter='*' test",
     "lint": "bun run --filter='*' lint",
     "format": "bun run --filter='*' format",
-    "web:dev": "bun run --filter='web' dev",
-    "cli:dev": "bun run --filter='cli' dev",
-    "dev:web": "tsx src/web.ts",
-    "start:web": "node dist/web.js"
+    "web:dev": "bun run --filter='@mcpis9/web' dev",
+    "cli:dev": "bun run --filter='@mcpis9/cli' dev",
+    "shared:dev": "bun run --filter='@mcpis9/shared' dev",
+    "dev:all": "bun run --filter='*' dev"
   },
   "keywords": [
     "ai",
