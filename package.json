@@ -1,18 +1,20 @@
 {
-  "name": "mcpis9",
+  "name": "mcpis9-monorepo",
   "version": "0.1.0",
   "description": "Твой дружелюбный AI-помощник для работы с AI-инструментами, CLI и разработкой",
-  "main": "dist/index.js",
-  "bin": {
-    "mcpis9": "dist/cli/index.js"
-  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "tsx src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "test": "jest",
-    "lint": "eslint src/**/*.ts",
-    "format": "prettier --write src/**/*.ts"
+    "dev": "bun run --filter='*' dev",
+    "build": "bun run --filter='*' build",
+    "start": "bun run --filter='*' start",
+    "test": "bun run --filter='*' test",
+    "lint": "bun run --filter='*' lint",
+    "format": "bun run --filter='*' format",
+    "web:dev": "bun run --filter='web' dev",
+    "cli:dev": "bun run --filter='cli' dev"
   },
   "keywords": [
     "ai",
