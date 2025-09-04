@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { AsciiFace } from '@/components/ui/ascii-face'
 import { 
   MessageSquare, 
   Brain, 
@@ -72,6 +73,11 @@ export function Sidebar() {
             </Button>
           </div>
         </nav>
+
+        {/* ASCII лицо */}
+        <div className="p-2 border-t">
+          <AsciiFace className="mb-4" />
+        </div>
 
         {/* История */}
         <div className="p-4 border-t">

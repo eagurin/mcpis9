@@ -4,12 +4,26 @@
 export class Logger {
   
   /**
-   * Приветственное сообщение
+   * Приветственное сообщение с ASCII-лицом
    */
   welcome(): void {
     console.log('');
     console.log('🤖✨ ═══════════════════════════════════════ ✨🤖');
-    console.log('     mcpis9 - Твой AI-друг и помощник');
+    console.log('');
+    console.log('                    ╭─────────╮');
+    console.log('                   ╱           ╲');
+    console.log('                  ╱  ◉     ◉   ╲');
+    console.log('                 ╱               ╲');
+    console.log('                ╱       ___       ╲');
+    console.log('               ╱       ╱   ╲       ╲');
+    console.log('              ╱        ╲___╱        ╲');
+    console.log('             ╱                       ╲');
+    console.log('            ╱_________________________╲');
+    console.log('           ╱                           ╲');
+    console.log('          ╱      mcpis9 - Привет!      ╲');
+    console.log('         ╱    Твой AI-друг и помощник   ╲');
+    console.log('        ╱_______________________________╲');
+    console.log('');
     console.log('🤖✨ ═══════════════════════════════════════ ✨🤖');
     console.log('');
   }

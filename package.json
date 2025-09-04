@@ -14,7 +14,9 @@
     "lint": "bun run --filter='*' lint",
     "format": "bun run --filter='*' format",
     "web:dev": "bun run --filter='web' dev",
-    "cli:dev": "bun run --filter='cli' dev"
+    "cli:dev": "bun run --filter='cli' dev",
+    "dev:web": "tsx src/web.ts",
+    "start:web": "node dist/web.js"
   },
   "keywords": [
     "ai",
