@@ -1,7 +1,7 @@
 {
-  "name": "@mcpis9/shared",
+  "name": "@mcpis9/agents",
   "version": "0.1.0",
-  "description": "Общие типы и утилиты для mcpis9",
+  "description": "Agent system with Boss agent orchestration and R2R memory",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -13,9 +13,10 @@
   },
   "keywords": [
     "ai",
-    "shared",
-    "types",
-    "utilities"
+    "agents",
+    "orchestration",
+    "r2r",
+    "rag"
   ],
   "author": "Евгений <e.a.gurin@gmail.com>",
   "license": "MIT",
@@ -29,7 +30,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "chalk": "^5.0.0",
+    "@mcpis9/shared": "*",
     "r2r-js": "^0.3.0",
     "@anthropic-ai/sdk": "^0.28.0",
     "openai": "^4.67.0",

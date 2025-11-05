@@ -2,10 +2,12 @@
 
 import { Command } from 'commander';
 import { McpIS9 } from '../core/mcpis9';
+import { AgentHelper } from '../core/agent-helper';
 import { Logger } from '../utils/logger';
 
 const program = new Command();
 const logger = new Logger();
+const agentHelper = new AgentHelper();
 
 program
   .name('mcpis9')
@@ -48,6 +50,39 @@ program
     await mcpis9.getDevHelp(topic);
   });
 
+// Команда для работы с агентами
+program
+  .command('agent')
+  .description('Работа с агентной системой')
+  .option('-t, --task <description>', 'Описание задачи')
+  .option('-w, --worker <type>', 'Тип worker-агента (code, research, analysis, creative, devops)')
+  .option('-r, --requirements <items...>', 'Требования к выполнению задачи')
+  .option('-l, --list', 'Показать список агентов')
+  .option('-s, --status', 'Проверить статус системы')
+  .action(async (options) => {
+    if (options.list) {
+      agentHelper.showAgents();
+    } else if (options.status) {
+      await agentHelper.checkStatus();
+    } else if (options.task) {
+      if (options.worker) {
+        await agentHelper.executeWorkerTask(
+          options.worker,
+          options.task,
+          options.requirements || []
+        );
+      } else {
+        await agentHelper.executeBossTask(
+          options.task,
+          options.requirements || []
+        );
+      }
+    } else {
+      logger.info('Используйте: mcpis9 agent --help для справки');
+      agentHelper.showAgents();
+    }
+  });
+
 // Команда для быстрой справки
 program
   .command('help-me')
@@ -60,11 +95,20 @@ program
     logger.info('• mcpis9 ai <тема> - помощь по AI (claude, chatgpt, gemini)');
     logger.info('• mcpis9 cli <команда> - помощь по CLI (git, npm, docker)');
     logger.info('• mcpis9 dev <тема> - помощь по разработке (vscode, workflow)');
+    logger.info('• mcpis9 agent - работа с агентной системой');
+    logger.info('');
+    logger.info('🤖 Агентная система:');
+    logger.info('• mcpis9 agent --list - показать список агентов');
+    logger.info('• mcpis9 agent --status - проверить статус системы');
+    logger.info('• mcpis9 agent --task "описание" - выполнить задачу через Boss Agent');
+    logger.info('• mcpis9 agent --worker code --task "описание" - выполнить задачу через Code Agent');
     logger.info('');
     logger.info('📝 Примеры использования:');
     logger.info('• mcpis9 ai claude - узнать про Claude');
     logger.info('• mcpis9 cli git - помощь по Git');
     logger.info('• mcpis9 dev vscode - настройка VS Code');
+    logger.info('• mcpis9 agent --task "создать REST API" - задача для Boss Agent');
+    logger.info('• mcpis9 agent --worker research --task "найти информацию о TypeScript" - исследование');
     logger.info('');
     logger.tip('Используй mcpis9 start для интерактивного режима!');
   });
