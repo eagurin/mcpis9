@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import { McpIS9 } from '../core/mcpis9';
 import { Logger } from '../utils/logger';
+import { createAgentCommand } from '../commands/agent';
 
 const program = new Command();
 const logger = new Logger();
@@ -48,6 +49,9 @@ program
     await mcpis9.getDevHelp(topic);
   });
 
+// Agent system commands
+program.addCommand(createAgentCommand());
+
 // Команда для быстрой справки
 program
   .command('help-me')
@@ -61,12 +65,18 @@ program
     logger.info('• mcpis9 cli <команда> - помощь по CLI (git, npm, docker)');
     logger.info('• mcpis9 dev <тема> - помощь по разработке (vscode, workflow)');
     logger.info('');
+    logger.info('🧠 Agent System:');
+    logger.info('• mcpis9 agent chat - интерактивный чат с AI агентами');
+    logger.info('• mcpis9 agent status - статус агентной системы');
+    logger.info('• mcpis9 agent test - тестирование агентов');
+    logger.info('');
     logger.info('📝 Примеры использования:');
     logger.info('• mcpis9 ai claude - узнать про Claude');
     logger.info('• mcpis9 cli git - помощь по Git');
     logger.info('• mcpis9 dev vscode - настройка VS Code');
+    logger.info('• mcpis9 agent chat -m "Write a factorial function" - отправить запрос агенту');
     logger.info('');
-    logger.tip('Используй mcpis9 start для интерактивного режима!');
+    logger.tip('Используй mcpis9 agent chat для работы с продвинутой агентной системой!');
   });
 
 // Обработка случая, когда команда не указана
