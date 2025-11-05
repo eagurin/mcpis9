@@ -50,6 +50,16 @@ export function Sidebar() {
               <Code className="mr-2 h-4 w-4" />
               Разработка
             </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              size="sm"
+              onClick={() => window.location.href = '/agents'}
+            >
+              <Brain className="mr-2 h-4 w-4" />
+              Агенты
+            </Button>
           </div>
 
           <div className="mt-6 space-y-2">
